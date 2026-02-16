@@ -24,6 +24,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
+            'yolo_perception = amr_perception.yolo_node:main',
         ],
     },
 )
