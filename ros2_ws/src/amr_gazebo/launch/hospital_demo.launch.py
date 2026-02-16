@@ -20,7 +20,7 @@ def generate_launch_description():
         launch_arguments={'world': world_file}.items(),
     )
 
-    urdf_file = os.path.join(pkg_amr_gazebo, 'urdf', 'simple_robot.urdf')
+    urdf_file = os.path.join(pkg_amr_gazebo, 'urdf', 'hospital_amr.urdf')
     with open(urdf_file, 'r') as f:
         robot_desc = f.read()
 
