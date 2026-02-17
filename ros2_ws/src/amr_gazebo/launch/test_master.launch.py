@@ -103,6 +103,7 @@ def generate_launch_description():
             'model_path': 'yolo26n.pt',
             'image_topic': '/camera/image_raw',
             'detections_topic': '/perception/detections',
+            'annotated_image_topic': '/perception/annotated_image',
             'conf_threshold': 0.25
         }]
     )
