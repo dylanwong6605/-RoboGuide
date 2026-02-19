@@ -37,19 +37,6 @@ def generate_launch_description():
     nav2_params_file = os.path.join(pkg_nav, 'config', 'nav2_params.yaml')
     slam_params_file = os.path.join(pkg_nav, 'config', 'slam_params.yaml')
 
-    # ── SLAM Toolbox node ────────────────────────────────────────────────────
-    slam_node = Node(
-        condition=IfCondition(use_slam),
-        package='slam_toolbox',
-        executable='sync_slam_toolbox_node',
-        name='slam_toolbox',
-        output='screen',
-        parameters=[
-            slam_params_file,
-            {'use_sim_time': use_sim_time}
-        ]
-    )
-
     # ── Nav2 bringup (without map_server when doing SLAM) ───────────────────
     # We use the nav2_bringup navigation_launch.py which starts:
     #   controller_server, planner_server, behavior_server,
@@ -70,6 +57,5 @@ def generate_launch_description():
         use_sim_time_arg,
         use_slam_arg,
         map_yaml_arg,
-        slam_node,
         nav2_bringup,
     ])
