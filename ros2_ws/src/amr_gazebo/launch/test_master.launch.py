@@ -108,6 +108,23 @@ def generate_launch_description():
         }]
     )
     
+    # ── 7. RVIZ2 ───────────────────────────────────────────────────────────
+    rviz_config = os.path.join(
+        get_package_share_directory('nav2_bringup'),
+        'rviz',
+        'nav2_default_view.rviz'
+    )
+
+    rviz_node = Node(
+        package='rviz2',
+        executable='rviz2',
+        name='rviz2',
+        output='screen',
+        arguments=['-d', rviz_config],
+        parameters=[{'use_sim_time': use_sim_time}]
+    )
+
+    
     # ── LAUNCH DESCRIPTION ───────────────────────────────────────────────
     return LaunchDescription([
         # Arguments
@@ -125,4 +142,7 @@ def generate_launch_description():
         
         # Perception
         yolo_node,
+        
+        # Rviz2
+        rviz_node,
     ])
