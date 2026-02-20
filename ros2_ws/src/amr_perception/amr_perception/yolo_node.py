@@ -82,8 +82,8 @@ class YoloPerceptionNode(Node):
 
             detection = Detection2D()
             detection.header = msg.header
-            detection.bbox.center.x = cx
-            detection.bbox.center.y = cy
+            detection.bbox.center.position.x = cx
+            detection.bbox.center.position.y = cy
             detection.bbox.size_x = w
             detection.bbox.size_y = h
 
