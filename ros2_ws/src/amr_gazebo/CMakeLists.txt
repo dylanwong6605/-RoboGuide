@@ -24,8 +24,10 @@ endif()
 # Install directories
 install(DIRECTORY
   launch
-  urdf
   worlds
+  urdf
+  models
+  fuel_models
   DESTINATION share/${PROJECT_NAME}
 )
 
