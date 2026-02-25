@@ -1,6 +1,7 @@
 import rclpy
 import cv2
 from rclpy.node import Node
+from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSHistoryPolicy
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 from vision_msgs.msg import Detection2DArray, Detection2D
@@ -22,11 +23,24 @@ class YoloPerceptionNode(Node):
         self.declare_parameter('detections_topic', '/perception/detections')
         self.declare_parameter('annotated_image_topic', '/perception/annotated_image')
         self.declare_parameter('conf_threshold', 0.25)
+        self.declare_parameter('input_size', 640)
+        self.declare_parameter('use_fp16', True)
+        self.declare_parameter('worker_count', 1)
+        self.declare_parameter('worker_index', 0)
+        self.declare_parameter('publish_annotated', True)
 
         model_path = self.get_parameter('model_path').get_parameter_value().string_value
         image_topic = self.get_parameter('image_topic').get_parameter_value().string_value
         detections_topic = self.get_parameter('detections_topic').get_parameter_value().string_value
         annotated_image_topic = self.get_parameter('annotated_image_topic').get_parameter_value().string_value
+        self._input_size = int(self.get_parameter('input_size').get_parameter_value().integer_value)
+        self._use_fp16 = self.get_parameter('use_fp16').get_parameter_value().bool_value
+        self._worker_count = max(1, int(self.get_parameter('worker_count').get_parameter_value().integer_value))
+        self._worker_index = int(self.get_parameter('worker_index').get_parameter_value().integer_value)
+        self._publish_annotated = self.get_parameter('publish_annotated').get_parameter_value().bool_value
+
+        if self._worker_index < 0 or self._worker_index >= self._worker_count:
+            raise ValueError('worker_index must be in [0, worker_count-1]')
 
         if YOLO is None:
             self.get_logger().error(f'Ultralytics error: {_YOLO_IMPORT_ERROR}')
@@ -36,14 +50,31 @@ class YoloPerceptionNode(Node):
         self._model = YOLO(model_path)
         self._bridge = CvBridge()
 
-        self._image_sub = self.create_subscription(Image, image_topic, self._on_image, 10)
+        image_qos = QoSProfile(
+            reliability=QoSReliabilityPolicy.BEST_EFFORT,
+            history=QoSHistoryPolicy.KEEP_LAST,
+            depth=1,
+        )
+
+        annotated_qos = QoSProfile(
+            reliability=QoSReliabilityPolicy.RELIABLE,
+            history=QoSHistoryPolicy.KEEP_LAST,
+            depth=1,
+        )
+
+        self._image_sub = self.create_subscription(Image, image_topic, self._on_image, image_qos)
         self._detections_pub = self.create_publisher(Detection2DArray, detections_topic, 10)
-        self._annotated_image_pub = self.create_publisher(Image, annotated_image_topic, 10)
+        self._annotated_image_pub = self.create_publisher(Image, annotated_image_topic, annotated_qos)
 
         self.get_logger().info(f'YOLO26 Node Started. Model: {model_path}')
 
     def _on_image(self, msg: Image) -> None:
         conf_thres = self.get_parameter('conf_threshold').get_parameter_value().double_value
+
+        if self._worker_count > 1:
+            stamp_ns = (msg.header.stamp.sec * 1_000_000_000) + msg.header.stamp.nanosec
+            if (stamp_ns % self._worker_count) != self._worker_index:
+                return
 
         # Convert ROS Image to OpenCV
         cv_image = self._bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
@@ -55,7 +86,8 @@ class YoloPerceptionNode(Node):
             source=cv_image,
             conf=conf_thres,
             verbose=False,
-            half=True  # Optional: Uses FP16 for ~2x speed on supported GPUs
+            imgsz=self._input_size,
+            half=self._use_fp16
         )
 
         detection_array = Detection2DArray()
@@ -63,9 +95,10 @@ class YoloPerceptionNode(Node):
 
         if not results or len(results[0].boxes) == 0:
             self._detections_pub.publish(detection_array)
-            annotated_msg = self._bridge.cv2_to_imgmsg(annotated_image, encoding='bgr8')
-            annotated_msg.header = msg.header
-            self._annotated_image_pub.publish(annotated_msg)
+            if self._publish_annotated:
+                annotated_msg = self._bridge.cv2_to_imgmsg(annotated_image, encoding='bgr8')
+                annotated_msg.header = msg.header
+                self._annotated_image_pub.publish(annotated_msg)
             return
 
         result = results[0]
@@ -112,9 +145,10 @@ class YoloPerceptionNode(Node):
             )
 
         self._detections_pub.publish(detection_array)
-        annotated_msg = self._bridge.cv2_to_imgmsg(annotated_image, encoding='bgr8')
-        annotated_msg.header = msg.header
-        self._annotated_image_pub.publish(annotated_msg)
+        if self._publish_annotated:
+            annotated_msg = self._bridge.cv2_to_imgmsg(annotated_image, encoding='bgr8')
+            annotated_msg.header = msg.header
+            self._annotated_image_pub.publish(annotated_msg)
 
 def main(args=None):
     rclpy.init(args=args)
