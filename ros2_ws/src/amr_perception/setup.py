@@ -25,6 +25,7 @@ setup(
     entry_points={
         'console_scripts': [
             'yolo_perception = amr_perception.yolo_node:main',
+            'yolo_reactive_controller = amr_perception.people_reactive_controller:main',
         ],
     },
 )
