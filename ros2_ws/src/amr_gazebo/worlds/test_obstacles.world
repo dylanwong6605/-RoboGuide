@@ -150,83 +150,89 @@
       </link>
     </model>
 
-    <!-- PERSON 1: Walking with collision -->
-    <actor name="person_1">
-      <skin>
-        <filename>walk.dae</filename>
-        <scale>1.0</scale>
-      </skin>
-      <animation name="walking">
-        <filename>walk.dae</filename>
-        <scale>1.0</scale>
-        <interpolate_x>true</interpolate_x>
-      </animation>
-      <script>
-        <loop>true</loop>
-        <delay_start>0.0</delay_start>
-        <auto_start>true</auto_start>
-        <trajectory id="0" type="walking">
-          <waypoint>
-            <time>0</time>
-            <pose>7 -3 0 0 0 1.57</pose>
-          </waypoint>
-          <waypoint>
-            <time>5</time>
-            <pose>7 3 0 0 0 1.57</pose>
-          </waypoint>
-          <waypoint>
-            <time>10</time>
-            <pose>7 -3 0 0 0 1.57</pose>
-          </waypoint>
-        </trajectory>
-      </script>
-      <plugin name="person1_plugin" filename="libgazebo_ros_actor_command.so">
-        <collision_bounding_box>
-          <dimensions>1.0 1.0 2.0</dimensions>
-        </collision_bounding_box>
-        <obstacle_margin>1.0</obstacle_margin>
-        <animation_factor>5.1</animation_factor>
-      </plugin>
-    </actor>
+    <model name="person_1">
+      <pose>3 -3 0 0 0 0</pose>
+      <static>false</static>
 
-    <!-- PERSON 2: Walking with collision -->
-    <actor name="person_2">
-      <skin>
-        <filename>walk.dae</filename>
-        <scale>1.0</scale>
-      </skin>
-      <animation name="walking">
-        <filename>walk.dae</filename>
-        <scale>1.0</scale>
-        <interpolate_x>true</interpolate_x>
-      </animation>
-      <script>
-        <loop>true</loop>
-        <delay_start>2.0</delay_start>
-        <auto_start>true</auto_start>
-        <trajectory id="0" type="walking">
-          <waypoint>
-            <time>0</time>
-            <pose>-3 1 0 0 0 0</pose>
-          </waypoint>
-          <waypoint>
-            <time>8</time>
-            <pose>12 1 0 0 0 0</pose>
-          </waypoint>
-          <waypoint>
-            <time>16</time>
-            <pose>-3 1 0 0 0 0</pose>
-          </waypoint>
-        </trajectory>
-      </script>
-      <plugin name="person2_plugin" filename="libgazebo_ros_actor_command.so">
-        <collision_bounding_box>
-          <dimensions>1.0 1.0 2.0</dimensions>
-        </collision_bounding_box>
-        <obstacle_margin>1.0</obstacle_margin>
-        <animation_factor>5.1</animation_factor>
+      <link name="link">
+        <inertial>
+          <mass>5.0</mass>
+          <inertia>
+            <ixx>0.1</ixx><ixy>0</ixy><ixz>0</ixz>
+            <iyy>0.1</iyy><iyz>0</iyz>
+            <izz>0.1</izz>
+          </inertia>
+        </inertial>
+
+        <!-- Invisible collision box — what the lidar actually hits -->
+        <collision name="collision">
+          <geometry><box><size>0.5 0.5 1.8</size></box></geometry>
+          <pose>0 0 0.9 0 0 0</pose>
+        </collision>
+
+        <!-- Human mesh visual -->
+        <visual name="visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>/usr/share/gazebo-11/media/models/walk.dae</uri>
+              <scale>1.0 1.0 1.0</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+
+      <plugin name="person_1_planar_move" filename="libgazebo_ros_planar_move.so">
+        <ros>
+          <namespace>person_1</namespace>
+        </ros>
+        <update_rate>50</update_rate>
+        <publish_odom>false</publish_odom>
+        <publish_odom_tf>false</publish_odom_tf>
       </plugin>
-    </actor>
+    </model>
+
+    <model name="person_2">
+      <pose>-3 1 0 0 0 0</pose>
+      <static>false</static>
+
+      <link name="link">
+        <inertial>
+          <mass>5.0</mass>
+          <inertia>
+            <ixx>0.1</ixx><ixy>0</ixy><ixz>0</ixz>
+            <iyy>0.1</iyy><iyz>0</iyz>
+            <izz>0.1</izz>
+          </inertia>
+        </inertial>
+
+        <!-- Invisible collision box — what the lidar actually hits -->
+        <collision name="collision">
+          <geometry><box><size>0.5 0.5 1.8</size></box></geometry>
+          <pose>0 0 0.9 0 0 0</pose>
+        </collision>
+
+        <!-- Human mesh visual -->
+        <visual name="visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>/usr/share/gazebo-11/media/models/walk.dae</uri>
+              <scale>1.0 1.0 1.0</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+
+      <plugin name="person_2_planar_move" filename="libgazebo_ros_planar_move.so">
+        <ros>
+          <namespace>person_2</namespace>
+        </ros>
+        <update_rate>50</update_rate>
+        <publish_odom>false</publish_odom>
+        <publish_odom_tf>false</publish_odom_tf>
+      </plugin>
+    </model>
 
     <!-- PERSON 3: Standing with collision -->
     <actor name="person_3">
