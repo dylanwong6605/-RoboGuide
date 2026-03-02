@@ -140,6 +140,7 @@ def generate_launch_description():
             'cmd_vel_topic': '/cmd_vel',
             'person_class_id': 'person',
             'min_score': 0.5,
+            'min_person_bbox_height_px': 80.0,
             'hold_time': 0.5,
         }]
     )

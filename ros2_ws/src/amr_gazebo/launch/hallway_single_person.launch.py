@@ -83,10 +83,10 @@ def generate_launch_description():
         }.items()
     )
     
-    yolo_node = Node(
+    yolo_node_0 = Node(
         package='amr_perception',
         executable='yolo_perception',
-        name='yolo_detector',
+        name='yolo_detector_0',
         output='screen',
         parameters=[{
             'use_sim_time': use_sim_time,
@@ -94,7 +94,55 @@ def generate_launch_description():
             'image_topic': '/camera/image_raw',
             'detections_topic': '/perception/detections',
             'annotated_image_topic': '/perception/annotated_image',
-            'conf_threshold': 0.25
+            'conf_threshold': 0.25,
+            'input_size': 640,
+            'use_fp16': True,
+            'worker_count': 2,
+            'worker_index': 0,
+            'publish_annotated': True,
+        }]
+    )
+
+    yolo_node_1 = Node(
+        package='amr_perception',
+        executable='yolo_perception',
+        name='yolo_detector_1',
+        output='screen',
+        parameters=[{
+            'use_sim_time': use_sim_time,
+            'model_path': 'yolo26n.pt',
+            'image_topic': '/camera/image_raw',
+            'detections_topic': '/perception/detections',
+            'annotated_image_topic': '/perception/annotated_image',
+            'conf_threshold': 0.25,
+            'input_size': 640,
+            'use_fp16': True,
+            'worker_count': 2,
+            'worker_index': 1,
+            'publish_annotated': False,
+        }]
+    )
+
+
+    
+    # YOLO-based reactive controller: listens to /perception/detections and
+    # publishes zero velocity on /cmd_vel when a person is detected.
+    yolo_reactive_controller = Node(
+        package='amr_perception',
+        executable='yolo_reactive_controller',
+        name='yolo_reactive_controller',
+        output='screen',
+        parameters=[{
+            'detections_topic': '/perception/detections',
+            'cmd_vel_topic': '/cmd_vel',
+            'person_class_id': 'person',
+            'min_score': 0.5,
+            'min_person_bbox_height_px': 80.0,
+            'reaction_mode': 'yield',
+            'yield_linear_x': 0.08,
+            'yield_angular_z': 0.6,
+            'yield_direction': 'left',
+            'hold_time': 0.5,
         }]
     )
     
@@ -121,6 +169,8 @@ def generate_launch_description():
         spawn_entity,
         slam_node,
         nav2_bringup,
-        yolo_node,
+        yolo_node_0,
+        yolo_node_1,
+        yolo_reactive_controller,
         rviz_node,
     ])
