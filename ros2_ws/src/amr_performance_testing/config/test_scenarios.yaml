@@ -4,7 +4,7 @@
 # 
 # Instructions:
 # 1. Copy the template below for each test scenario
-# 2. Fill in your actual world/launch file names
+# 2. Fill in your actual world/launch/person_config file names
 # 3. Set start and goal poses (x, y coordinates in meters, theta in radians)
 # 4. Adjust timeout based on expected completion time
 #
@@ -21,6 +21,7 @@ scenarios:
   # - name: "SCENARIO_NAME_HERE"
   #   world: "YOUR_WORLD_FILE.world"
   #   launch: "YOUR_LAUNCH_FILE.launch.py"
+  #   person_config: "YOUR_PERSON_CONFIG.yaml"
   #   start_pose:
   #     x: 0.0      # meters
   #     y: 0.0      # meters
@@ -38,6 +39,7 @@ scenarios:
   - name: "example_hallway_test"
     world: "hallway_single_person.world"
     launch: "hallway_single_person.launch.py"
+    person_config: "hallway_single_person.yaml"
     start_pose:
       x: 0.0
       y: 0.0
