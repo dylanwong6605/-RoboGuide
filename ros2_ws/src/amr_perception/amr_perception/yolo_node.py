@@ -28,6 +28,7 @@ class YoloPerceptionNode(Node):
         self.declare_parameter('worker_count', 1)
         self.declare_parameter('worker_index', 0)
         self.declare_parameter('publish_annotated', True)
+        self.declare_parameter('frame_skip', 0)  # Number of frames to skip between processing
 
         model_path = self.get_parameter('model_path').get_parameter_value().string_value
         image_topic = self.get_parameter('image_topic').get_parameter_value().string_value
@@ -38,6 +39,8 @@ class YoloPerceptionNode(Node):
         self._worker_count = max(1, int(self.get_parameter('worker_count').get_parameter_value().integer_value))
         self._worker_index = int(self.get_parameter('worker_index').get_parameter_value().integer_value)
         self._publish_annotated = self.get_parameter('publish_annotated').get_parameter_value().bool_value
+        self._frame_skip = int(self.get_parameter('frame_skip').get_parameter_value().integer_value)
+        self._frame_counter = 0
 
         if self._worker_index < 0 or self._worker_index >= self._worker_count:
             raise ValueError('worker_index must be in [0, worker_count-1]')
@@ -59,7 +62,7 @@ class YoloPerceptionNode(Node):
         annotated_qos = QoSProfile(
             reliability=QoSReliabilityPolicy.RELIABLE,
             history=QoSHistoryPolicy.KEEP_LAST,
-            depth=1,
+            depth=10,
         )
 
         self._image_sub = self.create_subscription(Image, image_topic, self._on_image, image_qos)
@@ -69,6 +72,11 @@ class YoloPerceptionNode(Node):
         self.get_logger().info(f'YOLO26 Node Started. Model: {model_path}')
 
     def _on_image(self, msg: Image) -> None:
+        # Frame skipping logic
+        self._frame_counter += 1
+        if self._frame_skip > 0 and (self._frame_counter % (self._frame_skip + 1)) != 1:
+            return
+
         conf_thres = self.get_parameter('conf_threshold').get_parameter_value().double_value
 
         if self._worker_count > 1:
