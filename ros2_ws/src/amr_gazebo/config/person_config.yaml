@@ -1,0 +1,96 @@
+# person_config.yaml
+# -------------------
+# One person per movement type — 8 people total.
+# Each person is placed in a different spot in the world
+# so they don't collide with each other or the robot (at origin).
+
+persons:
+
+  # ── 1. back_and_forth ───────────────────────────────────────────────────────
+  # Bounces along the Y axis between y=-3 and y=+3, starting at x=3
+  - name: person_1
+    movement: back_and_forth
+    axis: y
+    speed: 1.0
+    distance: 6.0       # 3 m each way
+    start_offset: 0.0
+
+  # ── 2. circle ───────────────────────────────────────────────────────────────
+  # Loops in a circle of radius ~3 m (speed / angular = 1.18 / 0.393 ≈ 3 m)
+  - name: person_2
+    movement: circle
+    speed: 1.18
+    angular: 0.393
+
+  # ── 3. diagonal ─────────────────────────────────────────────────────────────
+  # Moves at 45 degrees, bounces back. Starts near (-3, -3)
+  - name: person_3
+    movement: diagonal
+    angle: 45           # degrees
+    speed: 1.0
+    distance: 5.0
+    start_offset: 0.0
+
+  # ── 4. waypoint ─────────────────────────────────────────────────────────────
+  # Goes 6 in X, then 4 in Y, then reverses back.
+  # Points are RELATIVE to where person_4 spawns in the world file.
+  - name: person_4
+    movement: waypoint
+    speed: 1.0
+    loop: reverse       # walks back through waypoints in reverse
+    points:
+      - [6, 0]          # move 6 m in X
+      - [6, 4]          # then 4 m in Y
+      - [0, 0]          # back to start
+
+  # ── 5. random_walk ──────────────────────────────────────────────────────────
+  # Picks a new random direction every 3 seconds
+  - name: person_5
+    movement: random_walk
+    speed: 0.8
+    change_interval: 3.0
+
+  # ── 6. patrol ───────────────────────────────────────────────────────────────
+  # Loops through waypoints continuously without reversing (one-way circuit)
+  - name: person_6
+    movement: patrol
+    speed: 1.0
+    points:
+      - [2, 0]
+      - [2, 2]
+      - [0, 2]
+      - [0, 0]
+
+  # ── 7. figure_eight ─────────────────────────────────────────────────────────
+  # Drives a figure-eight pattern with radius 2 m
+  - name: person_7
+    movement: figure_eight
+    speed: 1.0
+    radius: 2.0
+
+  # ── 8. zigzag ───────────────────────────────────────────────────────────────
+  # Alternates between +45 and -45 degree diagonals, making a Z pattern
+  - name: person_8
+    movement: zigzag
+    speed: 1.0
+    angle: 45
+    distance: 3.0       # distance per leg before switching angle
+
+  # ── Bonus examples (commented out — uncomment to use) ─────────────────────
+
+  # Sways gently in place (good for a standing person)
+  # - name: person_9
+  #   movement: oscillate
+  #   speed: 0.3
+  #   distance: 0.4
+
+  # Sprints, pauses 2 seconds, reverses
+  # - name: person_10
+  #   movement: sprint_and_pause
+  #   speed: 2.0
+  #   distance: 4.0
+  #   pause_duration: 2.0
+
+  # Just stands still
+  # - name: person_11
+  #   movement: stationary
