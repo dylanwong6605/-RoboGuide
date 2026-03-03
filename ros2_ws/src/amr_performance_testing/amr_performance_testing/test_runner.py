@@ -134,7 +134,7 @@ class TestRunner:
             
             # Wait for system to initialize
             print('[WAIT] Waiting for Gazebo and Nav2 to initialize (30s)...')
-            time.sleep(3)
+            time.sleep(30)
 
             # ── Launch target_mover with this scenario's person config ──────
             self.launch_target_mover(scenario)
