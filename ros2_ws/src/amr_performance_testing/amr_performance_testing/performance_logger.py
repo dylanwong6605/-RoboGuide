@@ -288,17 +288,14 @@ class PerformanceLogger(Node):
         }
     
     def save_results(self):
-        """Save metrics to CSV file."""
+        """Save metrics to combined CSV file."""
         metrics = self.calculate_metrics()
         
         # Create output directory if it doesn't exist
         os.makedirs(self.output_dir, exist_ok=True)
         
-        # Create filename
-        filename = os.path.join(
-            self.output_dir,
-            f'{self.scenario_name}_run{self.run_number}.csv'
-        )
+        # Use COMBINED filename for all scenarios
+        filename = os.path.join(self.output_dir, 'combined_results.csv')
         
         # Write to CSV
         file_exists = os.path.isfile(filename)
@@ -326,8 +323,14 @@ def main(args=None):
     rclpy.init(args=args)
     logger = PerformanceLogger()
     
-    # Send goal after a short delay to let everything initialize
-    time.sleep(2.0)
+    # Wait for Nav2 action server to be ready
+    logger.get_logger().info('Waiting for Nav2 action server to be ready...')
+    logger.nav_client.wait_for_server(timeout_sec=60.0)
+    
+    # Extra delay for SLAM to build initial map
+    logger.get_logger().info('Waiting 15s for SLAM to build map...')
+    time.sleep(15.0)
+    
     logger.send_goal()
     
     try:
