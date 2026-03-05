@@ -1,0 +1,26 @@
+# 5 people walking randomly - chaotic crowded hallway
+persons:
+  - name: person_1
+    movement: random_walk
+    speed: 0.7
+    change_interval: 3.0
+  
+  - name: person_2
+    movement: random_walk
+    speed: 0.8
+    change_interval: 2.5
+  
+  - name: person_3
+    movement: random_walk
+    speed: 0.6
+    change_interval: 4.0
+  
+  - name: person_4
+    movement: random_walk
+    speed: 0.9
+    change_interval: 3.5
+  
+  - name: person_5
+    movement: random_walk
+    speed: 0.7
+    change_interval: 2.0

@@ -1,0 +1,9 @@
+# Person moves back and forth across hallway (Y-axis)
+# Crosses the robot's path repeatedly
+persons:
+  - name: person_1
+    movement: back_and_forth
+    axis: y              # Move side to side (across hallway)
+    speed: 1.0           # 1 m/s
+    distance: 8.0        # Travel 8m total (4m each way)
+    start_offset: 0.0

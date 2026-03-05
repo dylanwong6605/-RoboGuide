@@ -36,18 +36,75 @@ scenarios:
   # YOUR TEST SCENARIOS (add below)
   # ──────────────────────────────────────────────────────────────────
   
-  - name: "example_hallway_test"
-    world: "hallway_single_person.world"
-    launch: "hallway_single_person.launch.py"
-    person_config: "hallway_single_person.yaml"
+  - name: "hallway_empty"
+    world: "hallway_empty.world"
+    launch: "hallway_empty.launch.py"
+    person_config: null
     start_pose:
-      x: 0.0
+      x: -12.0
       y: 0.0
       theta: 0.0
     goal_pose:
-      x: 10.0
+      x: 12.0
       y: 0.0
       theta: 0.0
     timeout: 120
-  
+
+  - name: "hallway_static_person"
+    world: "hallway_static_person.world"
+    launch: "hallway_static_person.launch.py"
+    person_config: null
+    start_pose:
+      x: -12.0
+      y: 0.0
+      theta: 0.0
+    goal_pose:
+      x: 12.0
+      y: 0.0
+      theta: 0.0
+    timeout: 120
+
+  - name: "hallway_moving_person"
+    world: "hallway_moving_person.world"
+    launch: "hallway_moving_person.launch.py"
+    person_config: "hallway_moving_person.yaml"
+    start_pose:
+      x: -12.0
+      y: 0.0
+      theta: 0.0
+    goal_pose:
+      x: 12.0
+      y: 0.0
+      theta: 0.0
+    timeout: 120
+
+  - name: "hallway_oncoming_traffic"
+    world: "hallway_oncoming_traffic.world"
+    launch: "hallway_oncoming_traffic.launch.py"
+    person_config: "hallway_oncoming_traffic.yaml"
+    start_pose:
+      x: -12.0
+      y: 0.0
+      theta: 0.0
+    goal_pose:
+      x: 12.0
+      y: 0.0
+      theta: 0.0
+    timeout: 120
+
+  - name: "hallway_crowded"
+    world: "hallway_crowded.world"
+    launch: "hallway_crowded.launch.py"
+    person_config: "hallway_crowded.yaml"
+    start_pose:
+      x: -12.0
+      y: 0.0
+      theta: 0.0
+    goal_pose:
+      x: 12.0
+      y: 0.0
+      theta: 0.0
+    timeout: 300
+
+
   # Add more scenarios here...

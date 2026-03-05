@@ -1,0 +1,17 @@
+# Two people walking toward each other down the hallway
+persons:
+  # Person 1: Walks backward (from +8 toward -8)
+  - name: person_1
+    movement: back_and_forth
+    axis: x              # Move along hallway length
+    speed: 0.8
+    distance: 16.0       # 8m each way
+    start_offset: 0.0
+
+  # Person 2: Walks forward (from -8 toward +8)  
+  - name: person_2
+    movement: back_and_forth
+    axis: x
+    speed: 0.8
+    distance: 16.0
+    start_offset: 8.0    # Start offset so they meet in middle

@@ -193,26 +193,31 @@ class TestRunner:
             return False
 
     def cleanup_processes(self):
-        """Kill all running processes including target_mover."""
+        """Kill all running processes."""
         print('\n[CLEANUP] Stopping all processes...')
-
+        
         for process in self.current_processes:
             try:
-                # Kill process group to get all child processes
-                os.killpg(os.getpgid(process.pid), signal.SIGTERM)
-                process.wait(timeout=5)
-            except:
+                # Try graceful termination first
+                process.terminate()
                 try:
-                    process.kill()
+                    process.wait(timeout=3)
                 except:
-                    pass
+                    # Force kill if still running
+                    process.kill()
+            except:
+                pass
         
         self.current_processes = []
         
         # Extra cleanup - kill any lingering gazebo/ros processes
-        subprocess.run(['pkill', '-9', 'gzserver'], stderr=subprocess.DEVNULL)
-        subprocess.run(['pkill', '-9', 'gzclient'], stderr=subprocess.DEVNULL)
-        subprocess.run(['pkill', '-f', 'mover'],  stderr=subprocess.DEVNULL)
+        try:
+            subprocess.run(['pkill', '-9', 'gzserver'], stderr=subprocess.DEVNULL)
+            subprocess.run(['pkill', '-9', 'gzclient'], stderr=subprocess.DEVNULL)
+            subprocess.run(['pkill', '-f', 'mover'], stderr=subprocess.DEVNULL)
+            subprocess.run(['pkill', '-f', 'performance_logger'], stderr=subprocess.DEVNULL)
+        except:
+            pass
         
         print('[CLEANUP] All processes stopped')
         
