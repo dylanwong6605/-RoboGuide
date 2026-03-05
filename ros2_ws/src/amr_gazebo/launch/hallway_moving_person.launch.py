@@ -57,19 +57,41 @@ def generate_launch_description():
 		output='screen'
 	)
 
-	slam_params = os.path.join(pkg_nav, 'config', 'slam_params.yaml')
-	slam_node = Node(
-		package='slam_toolbox',
-		executable='sync_slam_toolbox_node',
-		name='slam_toolbox',
+	map_file = os.path.join(pkg_nav, 'maps', 'hallway_moving_person.yaml')
+
+	map_server = Node(
+		package='nav2_map_server',
+		executable='map_server',
+		name='map_server',
 		output='screen',
-		parameters=[
-			slam_params,
-			{'use_sim_time': use_sim_time},
-		]
+		parameters=[{
+			'use_sim_time': use_sim_time,
+			'yaml_filename': map_file,
+		}]
 	)
 
 	nav2_params = os.path.join(pkg_nav, 'config', 'nav2_params.yaml')
+
+	amcl = Node(
+		package='nav2_amcl',
+		executable='amcl',
+		name='amcl',
+		output='screen',
+		parameters=[nav2_params, {'use_sim_time': use_sim_time}]
+	)
+
+	localization_lifecycle = Node(
+		package='nav2_lifecycle_manager',
+		executable='lifecycle_manager',
+		name='lifecycle_manager_localization',
+		output='screen',
+		parameters=[{
+			'use_sim_time': use_sim_time,
+			'autostart': True,
+			'node_names': ['map_server', 'amcl'],
+		}]
+	)
+
 	nav2_bringup = IncludeLaunchDescription(
 		PythonLaunchDescriptionSource(
 			os.path.join(pkg_nav, 'launch', 'nav2.launch.py')
@@ -157,7 +179,10 @@ def generate_launch_description():
 		robot_state_publisher,
 		spawn_entity,
 
-		slam_node,
+		map_server,
+		amcl,
+		localization_lifecycle,
+
 		nav2_bringup,
 
 		yolo_node_0,

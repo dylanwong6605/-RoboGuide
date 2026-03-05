@@ -37,6 +37,7 @@ import random
 
 DEFAULT_CONFIG = os.path.join(
     os.path.dirname(os.path.abspath(__file__)),
+    'config',
     'person_config.yaml'
 )
 

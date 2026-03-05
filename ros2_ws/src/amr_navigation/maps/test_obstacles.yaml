@@ -1,0 +1,6 @@
+image: test_obstacles.pgm
+resolution: 0.05
+origin: [-16.0000, -6.1000, 0.0]
+negate: 0
+occupied_thresh: 0.65
+free_thresh: 0.196

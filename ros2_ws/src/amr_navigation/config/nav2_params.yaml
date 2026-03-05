@@ -38,6 +38,11 @@ amcl:
     z_rand: 0.5
     z_short: 0.05
     scan_topic: scan
+    set_initial_pose: true
+    initial_pose_x: 0.0
+    initial_pose_y: 0.0
+    initial_pose_z: 0.0
+    initial_pose_yaw: 0.0
 
 bt_navigator:
   ros__parameters:
@@ -130,12 +135,12 @@ controller_server:
     # failed progress checks and the stop/recover/replan loop in the logs.
     FollowPath:
       plugin: "nav2_regulated_pure_pursuit_controller::RegulatedPurePursuitController"
-      desired_linear_vel: 0.6
+      desired_linear_vel: 0.8
       lookahead_dist: 0.6
-      min_lookahead_dist: 0.3
-      max_lookahead_dist: 0.9
-      lookahead_time: 1.5
-      rotate_to_heading_angular_vel: 1.8
+      min_lookahead_dist: 0.5
+      max_lookahead_dist: 1.5
+      lookahead_time: 1.0
+      rotate_to_heading_angular_vel: 2.5
       transform_tolerance: 0.2
       use_velocity_scaled_lookahead_dist: true
       min_approach_linear_velocity: 0.05
@@ -149,8 +154,8 @@ controller_server:
       regulated_linear_scaling_min_speed: 0.25
       use_rotate_to_heading: true         # KEY: rotates in place instead of arcing forward
       allow_reversing: false
-      rotate_to_heading_min_angle: 0.785  # ~45 deg threshold — rotate first if heading error > this
-      max_angular_accel: 3.2
+      rotate_to_heading_min_angle: 0.6
+      max_angular_accel: 5.0
       max_robot_pose_search_dist: 10.0
 
 local_costmap:
@@ -169,8 +174,8 @@ local_costmap:
       plugins: ["obstacle_layer", "inflation_layer"]
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
-        cost_scaling_factor: 3.0
-        inflation_radius: 0.6
+        cost_scaling_factor: 5.0
+        inflation_radius: 0.55
       obstacle_layer:
         plugin: "nav2_costmap_2d::ObstacleLayer"
         enabled: True
@@ -291,10 +296,10 @@ velocity_smoother:
     smoothing_frequency: 20.0
     scale_velocities: False
     feedback: "OPEN_LOOP"
-    max_velocity: [0.6, 0.0, 4.0]
+    max_velocity: [1.2, 0.0, 4.0]
     min_velocity: [-0.3, 0.0, -2.0]
-    max_accel: [2.5, 0.0, 8.0]
-    max_decel: [-2.5, 0.0, -3.0]
+    max_accel: [3.0, 0.0, 8.0]
+    max_decel: [-3.0, 0.0, -3.0]
     odom_topic: "odom"
     odom_duration: 0.1
     deadband_velocity: [0.0, 0.0, 0.0]
