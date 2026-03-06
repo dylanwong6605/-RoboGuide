@@ -58,6 +58,40 @@ class TestRunner:
         os.makedirs(self.results_dir, exist_ok=True)
         print(f'[INFO] Results will be saved to: {self.results_dir}')
 
+    def set_initial_pose(self, scenario):
+        """Publish initial pose to AMCL so map→odom transform starts."""
+        start = scenario['start_pose']
+        x = start['x']
+        y = start['y']
+        theta = start.get('theta', 0.0)
+
+        # Convert theta (yaw) to quaternion z and w
+        import math
+        qz = math.sin(theta / 2.0)
+        qw = math.cos(theta / 2.0)
+
+        print(f'[POSE] Setting initial pose: x={x}, y={y}, theta={theta}')
+
+        cmd = [
+            'ros2', 'topic', 'pub', '--once', '/initialpose',
+            'geometry_msgs/msg/PoseWithCovarianceStamped',
+            (
+                '{'
+                f'header: {{frame_id: "map"}}, '
+                f'pose: {{pose: {{position: {{x: {x}, y: {y}, z: 0.0}}, '
+                f'orientation: {{x: 0.0, y: 0.0, z: {qz}, w: {qw}}}}}, '
+                f'covariance: [0.25,0,0,0,0,0, 0,0.25,0,0,0,0, 0,0,0,0,0,0, '
+                f'0,0,0,0,0,0, 0,0,0,0,0,0, 0,0,0,0,0,0.068]}}'
+                '}'
+            )
+        ]
+
+        try:
+            subprocess.run(cmd, timeout=10)
+            print('[POSE] Initial pose published successfully')
+        except Exception as e:
+            print(f'[POSE][ERROR] Failed to set initial pose: {e}')
+
     def launch_target_mover(self, scenario):
         """
         Launch mover.py with the scenario's person config.
@@ -135,6 +169,10 @@ class TestRunner:
             # Wait for system to initialize
             print('[WAIT] Waiting for Gazebo and Nav2 to initialize (30s)...')
             time.sleep(30)
+
+            # ── Set initial pose so AMCL can publish map→odom transform ──────
+            self.set_initial_pose(scenario)
+            time.sleep(2)  # give AMCL a moment to process it
 
             # ── Launch target_mover with this scenario's person config ──────
             self.launch_target_mover(scenario)
@@ -214,6 +252,7 @@ class TestRunner:
         try:
             subprocess.run(['pkill', '-9', 'gzserver'], stderr=subprocess.DEVNULL)
             subprocess.run(['pkill', '-9', 'gzclient'], stderr=subprocess.DEVNULL)
+            subprocess.run(['pkill', '-f', 'rviz2'], stderr=subprocess.DEVNULL)
             subprocess.run(['pkill', '-f', 'mover'], stderr=subprocess.DEVNULL)
             subprocess.run(['pkill', '-f', 'performance_logger'], stderr=subprocess.DEVNULL)
         except:
