@@ -1,0 +1,86 @@
+persons:
+
+  - name: person_1       # Section A — back_and_forth across width
+    movement: back_and_forth
+    axis: y
+    speed: 0.8
+    distance: 4.0
+    start_offset: 0.0
+
+  - name: person_2       # Section A — sprint and pause along length
+    movement: sprint_and_pause
+    speed: 1.5
+    distance: 5.0
+    pause_duration: 1.5
+
+  - name: person_3       # Section A — stationary
+    movement: stationary
+
+  - name: person_4       # Section B — back and forth across width
+    movement: back_and_forth
+    axis: x
+    speed: 0.7
+    distance: 3.0
+    start_offset: 0.5
+
+  - name: person_5       # Section B — oscillate
+    movement: oscillate
+    speed: 0.35
+    distance: 0.6
+
+  - name: person_6       # Section C — circle, fits in 4m wide corridor
+    movement: circle
+    speed: 0.8
+    angular: 0.45
+
+  - name: person_7       # Section C — random walk
+    movement: random_walk
+    speed: 0.7
+    change_interval: 3.5
+
+  - name: person_8       # Section C — stationary
+    movement: stationary
+
+  - name: person_9       # Section C — waypoint along corridor
+    movement: waypoint
+    speed: 1.0
+    loop: reverse
+    points:
+      - [ 3.0,  0.0]
+      - [ 3.0,  1.0]
+      - [-3.0,  1.0]
+      - [-3.0,  0.0]
+
+  - name: person_10      # Section D — zigzag
+    movement: zigzag
+    speed: 0.8
+    angle: 25
+    distance: 4.0
+
+  - name: person_11      # Section D — back and forth along length
+    movement: back_and_forth
+    axis: y
+    speed: 0.7
+    distance: 4.5
+    start_offset: 1.0
+
+  - name: person_12      # Section D — patrol
+    movement: patrol
+    speed: 0.9
+    points:
+      - [ 0.0,  4.0]
+      - [ 0.0, -1.5]
+      - [ 0.0,  0.0]
+
+  - name: person_13      # Section E — figure eight
+    movement: figure_eight
+    speed: 0.8
+    radius: 1.5
+
+  - name: person_14      # Section E — random walk
+    movement: random_walk
+    speed: 0.7
+    change_interval: 4.0
+
+  - name: person_15      # Section E — stationary
+    movement: stationary
