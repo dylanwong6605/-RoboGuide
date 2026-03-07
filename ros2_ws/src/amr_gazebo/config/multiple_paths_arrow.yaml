@@ -1,0 +1,89 @@
+persons:
+  - name: gurney_1
+    movement: back_and_forth
+    axis: y
+    speed: 0.6
+    distance: 4.0
+    start_offset: 0.0
+
+  - name: gurney_2
+    movement: back_and_forth
+    axis: y
+    speed: 0.6
+    distance: 4.0
+    start_offset: 2.0
+
+  - name: person_1
+    movement: back_and_forth
+    axis: x
+    speed: 1.2
+    distance: 5.0
+    start_offset: 0.0
+
+  - name: person_2
+    movement: back_and_forth
+    axis: y
+    speed: 1.2
+    distance: 6.0
+    start_offset: 0.0
+
+  - name: person_3
+    movement: back_and_forth
+    axis: y
+    speed: 1.2
+    distance: 6.0
+    start_offset: 2.0
+
+  - name: person_4
+    movement: random_walk
+    speed: 0.6
+    change_interval: 3.0
+
+  - name: person_5
+    movement: random_walk
+    speed: 0.6
+    change_interval: 2.5
+
+  - name: person_6
+    movement: random_walk
+    speed: 0.6
+    change_interval: 3.5
+
+  - name: person_7
+    movement: random_walk
+    speed: 0.6
+    change_interval: 2.0
+
+  - name: person_8
+    movement: back_and_forth
+    axis: x
+    speed: 1.2
+    distance: 4.0
+    start_offset: 0.0
+
+  - name: person_9
+    movement: back_and_forth
+    axis: x
+    speed: 0.4
+    distance: 4.0
+    start_offset: 0.0
+
+  - name: person_10
+    movement: random_walk
+    speed: 0.3
+    change_interval: 4.0
+
+  - name: person_11
+    movement: random_walk
+    speed: 0.3
+    change_interval: 5.0
+
+  - name: person_12
+    movement: random_walk
+    speed: 0.3
+    change_interval: 4.5
+
+  - name: person_13
+    movement: random_walk
+    speed: 0.3
+    change_interval: 3.5
