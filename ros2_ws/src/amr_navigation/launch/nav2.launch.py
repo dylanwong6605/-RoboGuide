@@ -48,7 +48,6 @@ def generate_launch_description():
         launch_arguments={
             'use_sim_time': use_sim_time,
             'params_file':  nav2_params_file,
-            # When use_slam=true the map comes from slam_toolbox, not map_server
             'use_composition': 'False',
         }.items()
     )
