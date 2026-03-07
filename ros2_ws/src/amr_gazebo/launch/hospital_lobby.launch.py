@@ -20,7 +20,7 @@ def generate_launch_description():
 
 	world_arg = DeclareLaunchArgument(
 		'world',
-		default_value='test_obstacles',
+		default_value='hospital_lobby',
 		description='World file name (without .world extension)'
 	)
 
@@ -53,11 +53,11 @@ def generate_launch_description():
 	spawn_entity = Node(
 		package='gazebo_ros',
 		executable='spawn_entity.py',
-		arguments=['-topic', 'robot_description', '-entity', 'hospital_amr', '-z', '0.5'],
+		arguments=['-topic', 'robot_description', '-entity', 'hospital_amr', '-x', '0.0', '-y', '-4.5', '-z', '0.5'],
 		output='screen'
 	)
 
-	map_file = os.path.join(pkg_nav, 'maps', 'test_obstacles.yaml')
+	map_file = os.path.join(pkg_nav, 'maps', 'hospital_lobby.yaml')
 
 	map_server = Node(
 		package='nav2_map_server',
@@ -87,7 +87,7 @@ def generate_launch_description():
 				cmd=[
 					'ros2', 'topic', 'pub', '--once', '/initialpose',
 					'geometry_msgs/msg/PoseWithCovarianceStamped',
-					'{"header": {"frame_id": "map"}, "pose": {"pose": {"position": {"x": 0.0, "y": 0.0, "z": 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": 0.0, "w": 1.0}}, "covariance": [0.25,0,0,0,0,0,0,0.25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.068]}}'
+					'{"header": {"frame_id": "map"}, "pose": {"pose": {"position": {"x": 0.0, "y": -4.5, "z": 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": 0.0, "w": 1.0}}, "covariance": [0.25,0,0,0,0,0,0,0.25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.068]}}'
 				],
 				output='screen'
 			)
@@ -205,4 +205,6 @@ def generate_launch_description():
 		yolo_reactive_controller,
 
 		rviz_node,
+
+		
 	])

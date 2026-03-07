@@ -1,0 +1,62 @@
+persons:
+  - name: person_1
+    movement: random_walk
+    speed: 0.5
+    change_interval: 3.0
+
+  - name: person_2
+    movement: waypoint
+    speed: 3.0
+    loop: reverse
+    points:
+      - [1, 0]
+      - [1, -5]
+      - [1, 0]
+
+  - name: person_3
+    movement: random_walk
+    speed: 0.5
+    change_interval: 3.0
+
+  - name: person_4
+    movement: random_walk
+    speed: 0.5
+    change_interval: 3.0
+
+  - name: person_5
+    movement: stationary
+
+  - name: person_6
+    movement: waypoint
+    speed: 2.0
+    points:
+      - [-10, 0]
+      - [0, 0]
+
+  - name: moving_box
+    movement: waypoint
+    speed: 2.0
+    points:
+      - [-10, 0]
+      - [0, 0]
+
+  - name: person_7
+    movement: random_walk
+    speed: 0.5
+    change_interval: 3.0
+
+  - name: person_8
+    movement: random_walk
+    speed: 0.5
+    change_interval: 3.0
+
+  - name: person_9
+    movement: random_walk
+    speed: 0.5
+    change_interval: 3.0
+
+  - name: person_10
+    movement: random_walk
+    speed: 0.5
+    change_interval: 3.0
+
