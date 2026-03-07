@@ -19,6 +19,10 @@ import signal
 import sys
 import csv
 import argparse
+import re
+import math
+import json
+import shutil
 from datetime import datetime
 
 TARGET_MOVER_SCRIPT = '/ros2_ws/src/amr_gazebo/mover.py'
@@ -26,6 +30,15 @@ PERSON_CONFIG_DIR = '/ros2_ws/src/amr_gazebo/config'
 
 # PID of this script — so we never kill ourselves
 MY_PID = os.getpid()
+LIFECYCLE_STATE_RE = re.compile(
+    r'\b(unconfigured|inactive|active|finalized|configuring|activating|deactivating|cleaningup|shuttingdown|errorprocessing)\b',
+    re.IGNORECASE,
+)
+FASTDDS_SHM_ERR_RE = re.compile(r'rtps_transport_shm error', re.IGNORECASE)
+NAV2_MANAGED_ACTIVE_RE = re.compile(
+    r'lifecycle_manager_navigation.*Managed nodes are active',
+    re.IGNORECASE,
+)
 
 
 class TestRunner:
@@ -35,6 +48,7 @@ class TestRunner:
         self.config_file = config_file
         self.scenarios = []
         self.current_processes = []
+        self.log_files = []
         self.results_dir = '/ros2_ws/test_results'
         self.num_runs = num_runs
 
@@ -104,7 +118,51 @@ class TestRunner:
 
         print(f'[CSV] Wrote {reason} failure row for: {scenario["name"]} (run {run_number})')
 
-    def launch_target_mover(self, scenario):
+    def _open_process_log(self, process_name, scenario_name=None, run_number=None):
+        """Open a log file for a spawned process and keep the handle for cleanup."""
+        logs_dir = os.path.join(self.results_dir, 'process_logs')
+        os.makedirs(logs_dir, exist_ok=True)
+
+        safe_process = process_name.replace(' ', '_')
+        if scenario_name is not None and run_number is not None:
+            safe_scenario = str(scenario_name).replace(' ', '_')
+            log_filename = f'{safe_scenario}_run{run_number}_{safe_process}.log'
+        else:
+            log_filename = f'{safe_process}.log'
+
+        log_path = os.path.join(logs_dir, log_filename)
+        log_file = open(log_path, 'a', buffering=1)
+        self.log_files.append(log_file)
+        return log_file, log_path
+
+    def get_scenario_result(self, scenario_name, run_number):
+        """Return latest CSV row for scenario+run, or None if not found."""
+        csv_path = os.path.join(self.results_dir, 'combined_results.csv')
+        if not os.path.isfile(csv_path):
+            return None
+
+        latest_match = None
+        try:
+            with open(csv_path, 'r', newline='') as csvfile:
+                reader = csv.DictReader(csvfile)
+                for row in reader:
+                    if row.get('scenario_name') == scenario_name and str(row.get('run_number')) == str(run_number):
+                        latest_match = row
+        except Exception as e:
+            print(f'[CSV][WARN] Could not read combined results: {e}')
+            return None
+
+        return latest_match
+
+    @staticmethod
+    def _csv_success_to_bool(value):
+        if isinstance(value, bool):
+            return value
+        if value is None:
+            return False
+        return str(value).strip().lower() in ('1', 'true', 'yes')
+
+    def launch_target_mover(self, scenario, run_number=None):
         """
         Launch mover.py with the scenario's person config.
         Returns the process, or None if no person_config is defined
@@ -131,20 +189,23 @@ class TestRunner:
         mover_cmd = ['python3', TARGET_MOVER_SCRIPT, '--config', config_path]
 
         try:
+            log_file, log_path = self._open_process_log(
+                'mover', scenario.get('name'), run_number
+            )
             process = subprocess.Popen(
                 mover_cmd,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
+                stdout=log_file,
+                stderr=subprocess.STDOUT,
                 preexec_fn=os.setsid
             )
             self.current_processes.append(process)
-            print(f'[MOVER] target_mover.py started (PID {process.pid})')
+            print(f'[MOVER] target_mover.py started (PID {process.pid}) | log: {log_path}')
             return process
         except Exception as e:
             print(f'[MOVER][ERROR] Failed to launch target_mover.py: {e}')
             return None
 
-    def wait_for_nav2_ready(self, timeout=120):
+    def wait_for_nav2_ready(self, timeout=120, poll_interval=1.0, launch_log_path=None):
         """
         Wait until Nav2 lifecycle nodes are active by polling their state.
         Returns True if all nodes are active, False on timeout.
@@ -157,22 +218,123 @@ class TestRunner:
 
         print(f'[HEALTH] Waiting for Nav2 lifecycle nodes to become active (timeout: {timeout}s)...')
         start_time = time.time()
+        startup_requested = False
+        last_reported_state = {}
+        last_reported_query_output = {}
+        last_query_output_log_time = {}
+        last_nonzero_rc_state_log = {}
+
+        def extract_state(output_text):
+            matches = LIFECYCLE_STATE_RE.findall(output_text or '')
+            if not matches:
+                return None
+            return matches[-1].lower()
+
+        def strip_transient_noise(text):
+            if not text:
+                return ''
+            lines = []
+            for line in text.splitlines():
+                if FASTDDS_SHM_ERR_RE.search(line):
+                    continue
+                lines.append(line)
+            return '\n'.join(lines).strip()
+
+        def nav2_marked_active_in_launch_log():
+            if not launch_log_path:
+                return False
+            if not os.path.isfile(launch_log_path):
+                return False
+
+            try:
+                with open(launch_log_path, 'r', encoding='utf-8', errors='ignore') as f:
+                    content = f.read()
+                return NAV2_MANAGED_ACTIVE_RE.search(content) is not None
+            except Exception:
+                return False
+
+        def try_nav2_startup():
+            """Ask lifecycle manager to startup Nav2 if it is stuck unconfigured/inactive."""
+            startup_cmd = [
+                'ros2', 'service', 'call',
+                '/lifecycle_manager_navigation/manage_nodes',
+                'nav2_msgs/srv/ManageLifecycleNodes',
+                '{command: 0}'
+            ]
+            try:
+                result = subprocess.run(
+                    startup_cmd,
+                    capture_output=True,
+                    text=True,
+                    timeout=15,
+                )
+                combined = f"{result.stdout or ''}\n{result.stderr or ''}".strip()
+                if result.returncode == 0:
+                    print('[HEALTH] Requested Nav2 lifecycle startup via lifecycle_manager_navigation')
+                    return True
+                if combined:
+                    print(f'[HEALTH][WARN] Nav2 startup request failed: {combined}')
+            except Exception as e:
+                print(f'[HEALTH][WARN] Exception requesting Nav2 startup: {e}')
+            return False
 
         while time.time() - start_time < timeout:
+            # Fallback readiness signal from launch log when ROS2 CLI lifecycle query is flaky.
+            if nav2_marked_active_in_launch_log():
+                elapsed = time.time() - start_time
+                print(f'[HEALTH] Nav2 marked active by lifecycle_manager_navigation log after {elapsed:.1f}s')
+                return True
+
             all_active = True
+            non_active_states = []
             for node_name in nodes_to_check:
                 try:
                     result = subprocess.run(
                         ['ros2', 'lifecycle', 'get', f'/{node_name}'],
-                        capture_output=True, text=True, timeout=10
+                        capture_output=True, text=True, timeout=3
                     )
-                    output = result.stdout.strip().lower()
-                    if 'active' in output:
+                    output = (result.stdout or '').strip()
+                    stderr = (result.stderr or '').strip()
+                    combined = strip_transient_noise(f'{output}\n{stderr}')
+
+                    # Treat parsed lifecycle state as source of truth. `ros2 lifecycle get`
+                    # can return non-zero due transient daemon/DDS issues even when state is active.
+                    state = extract_state(output) or extract_state(combined)
+                    if state == 'active':
+                        if result.returncode != 0:
+                            prev_logged_state = last_nonzero_rc_state_log.get(node_name)
+                            if prev_logged_state != state:
+                                print(
+                                    f'[HEALTH][WARN] {node_name} reported active with non-zero lifecycle rc '
+                                    f'({result.returncode}); proceeding'
+                                )
+                                last_nonzero_rc_state_log[node_name] = state
                         pass
                     else:
+                        if state:
+                            if last_reported_state.get(node_name) != state:
+                                print(f'[HEALTH] {node_name} state: {state}')
+                                last_reported_state[node_name] = state
+                            non_active_states.append(state)
+                        elif combined:
+                            now = time.time()
+                            prev_output = last_reported_query_output.get(node_name)
+                            prev_time = last_query_output_log_time.get(node_name, 0.0)
+
+                            # Log noisy outputs like "Node not found" only on change and occasionally thereafter.
+                            if prev_output != combined or (now - prev_time) >= 10.0:
+                                print(f'[HEALTH] {node_name} lifecycle query output: {combined}')
+                                last_reported_query_output[node_name] = combined
+                                last_query_output_log_time[node_name] = now
                         all_active = False
                         break
-                except (subprocess.TimeoutExpired, Exception):
+                except subprocess.TimeoutExpired:
+                    all_active = False
+                    break
+                except Exception as e:
+                    if node_name not in last_reported_query_output:
+                        print(f'[HEALTH][WARN] lifecycle query exception for {node_name}: {e}')
+                        last_reported_query_output[node_name] = f'exception::{e}'
                     all_active = False
                     break
 
@@ -181,7 +343,15 @@ class TestRunner:
                 print(f'[HEALTH] All Nav2 nodes active after {elapsed:.1f}s')
                 return True
 
-            time.sleep(3)
+            elapsed = time.time() - start_time
+            if (
+                not startup_requested
+                and elapsed > 20
+                and any(state in ('unconfigured', 'inactive') for state in non_active_states)
+            ):
+                startup_requested = try_nav2_startup()
+
+            time.sleep(max(0.2, float(poll_interval)))
 
         print(f'[HEALTH][ERROR] Timeout waiting for Nav2 nodes after {timeout}s')
         return False
@@ -213,6 +383,55 @@ class TestRunner:
         print(f'[HEALTH][WARN] AMCL localization not confirmed after {timeout}s, proceeding anyway')
         return False
 
+    def publish_initial_pose(self, scenario):
+        """Publish /initialpose from scenario start_pose to re-seed AMCL each run."""
+        start_pose = scenario.get('start_pose', {})
+        x = float(start_pose.get('x', 0.0))
+        y = float(start_pose.get('y', 0.0))
+        theta = float(start_pose.get('theta', 0.0))
+
+        # Convert yaw to quaternion for PoseWithCovarianceStamped.
+        qz = math.sin(theta / 2.0)
+        qw = math.cos(theta / 2.0)
+
+        msg = json.dumps({
+            'header': {'frame_id': 'map'},
+            'pose': {
+                'pose': {
+                    'position': {'x': x, 'y': y, 'z': 0.0},
+                    'orientation': {'x': 0.0, 'y': 0.0, 'z': qz, 'w': qw},
+                },
+                'covariance': [
+                    0.10, 0, 0, 0, 0, 0,
+                    0, 0.10, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0.03,
+                ],
+            },
+        })
+
+        print(f'[HEALTH] Publishing /initialpose at ({x:.2f}, {y:.2f}, theta={theta:.2f})')
+        try:
+            result = subprocess.run(
+                [
+                    'ros2', 'topic', 'pub', '--once', '/initialpose',
+                    'geometry_msgs/msg/PoseWithCovarianceStamped', msg,
+                ],
+                capture_output=True,
+                text=True,
+                timeout=20,
+            )
+            if result.returncode != 0:
+                stderr = (result.stderr or '').strip()
+                print(f'[HEALTH][WARN] Failed to publish /initialpose (rc={result.returncode}): {stderr}')
+                return False
+            return True
+        except Exception as e:
+            print(f'[HEALTH][WARN] Exception publishing /initialpose: {e}')
+            return False
+
     def launch_scenario(self, scenario, run_number):
         """Launch a single test scenario. Returns 'success', 'timeout', or 'error'."""
         print(f'\n{"="*70}')
@@ -235,29 +454,45 @@ class TestRunner:
         launch_cmd = ['ros2', 'launch', 'amr_gazebo', scenario['launch']]
 
         try:
+            launch_log_file, launch_log_path = self._open_process_log(
+                'launch', scenario['name'], run_number
+            )
             launch_process = subprocess.Popen(
                 launch_cmd,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
+                stdout=launch_log_file,
+                stderr=subprocess.STDOUT,
                 preexec_fn=os.setsid
             )
             self.current_processes.append(launch_process)
+            print(f'[LAUNCH] amr_gazebo launch started (PID {launch_process.pid}) | log: {launch_log_path}')
 
-            # ── Phase 1: Wait for Gazebo to load ───────────────────────
-            print('[WAIT] Waiting 30s for Gazebo to load world...')
-            time.sleep(30)
+            # ── Phase 1: Short startup grace period (configurable) ─────
+            startup_grace = float(scenario.get('startup_grace_s', 40.0))
+            startup_grace = max(0.0, startup_grace)
+            if startup_grace > 0:
+                print(f'[WAIT] Waiting {startup_grace:.1f}s startup grace...')
+                time.sleep(startup_grace)
 
             # ── Phase 2: Active health checks ──────────────────────────
-            nav2_ready = self.wait_for_nav2_ready(timeout=120)
+            nav2_ready = self.wait_for_nav2_ready(
+                timeout=120,
+                poll_interval=1.0,
+                launch_log_path=launch_log_path,
+            )
             if not nav2_ready:
-                print('[ERROR] Nav2 did not become ready')
+                print('[HEALTH][ERROR] Nav2 did not become active for this run. Aborting scenario early.')
                 return 'error'
 
             # ── Phase 3: Wait for AMCL localization ────────────────────
             self.wait_for_amcl_localized(timeout=30)
 
+            # ── Phase 3b: Re-seed AMCL pose from scenario start pose ───
+            if self.publish_initial_pose(scenario):
+                print('[WAIT] Waiting 3s after /initialpose publication...')
+                time.sleep(3)
+
             # ── Phase 4: Launch target_mover ───────────────────────────
-            self.launch_target_mover(scenario)
+            self.launch_target_mover(scenario, run_number=run_number)
 
             if scenario.get('person_config'):
                 print('[WAIT] Waiting 5s for people to start moving...')
@@ -277,13 +512,18 @@ class TestRunner:
                 '-p', f'start_y:={scenario["start_pose"]["y"]}'
             ]
 
+            logger_log_file, logger_log_path = self._open_process_log(
+                'performance_logger', scenario['name'], run_number
+            )
+
             logger_process = subprocess.Popen(
                 logger_cmd,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
+                stdout=logger_log_file,
+                stderr=subprocess.STDOUT,
                 preexec_fn=os.setsid
             )
             self.current_processes.append(logger_process)
+            print(f'[LAUNCH] performance_logger started (PID {logger_process.pid}) | log: {logger_log_path}')
 
             # Wait for completion or timeout
             print(f'[RUNNING] Test in progress (timeout: {scenario["timeout"]}s)...')
@@ -292,9 +532,34 @@ class TestRunner:
             while True:
                 elapsed = time.time() - start_time
 
+                # End run as soon as logger records a result for this scenario/run.
+                result_row = self.get_scenario_result(scenario['name'], run_number)
+                if result_row is not None:
+                    if self._csv_success_to_bool(result_row.get('success')):
+                        print('[COMPLETE] Nav2 reached goal (CSV success=True). Ending run now.')
+                        return 'success'
+
+                    print('[COMPLETE][WARN] Logger recorded navigation failure. Ending run now.')
+                    return 'error'
+
                 if logger_process.poll() is not None:
-                    print('[COMPLETE] Performance logger finished')
-                    return 'success'
+                    logger_rc = logger_process.returncode
+                    print(f'[COMPLETE] Performance logger exited with code {logger_rc}')
+
+                    result_row = self.get_scenario_result(scenario['name'], run_number)
+                    if result_row is None:
+                        print('[COMPLETE][WARN] No matching CSV row found for this run')
+                        return 'error'
+
+                    if self._csv_success_to_bool(result_row.get('success')):
+                        return 'success'
+
+                    print('[COMPLETE][WARN] CSV result indicates navigation failure')
+                    return 'error'
+
+                if launch_process.poll() is not None:
+                    print(f'[ERROR] Launch process exited early with code {launch_process.returncode}')
+                    return 'error'
 
                 if elapsed > scenario['timeout']:
                     print(f'[TIMEOUT] Test exceeded {scenario["timeout"]}s')
@@ -314,6 +579,7 @@ class TestRunner:
         print('\n[CLEANUP] Stopping all processes...')
 
         my_pgid = os.getpgid(MY_PID)
+        force_kill_used = False
 
         # ── Step 1: Graceful SIGTERM to tracked process groups ─────
         for process in self.current_processes:
@@ -333,10 +599,18 @@ class TestRunner:
                     pgid = os.getpgid(process.pid)
                     if pgid != my_pgid:
                         os.killpg(pgid, signal.SIGKILL)
+                        force_kill_used = True
             except (ProcessLookupError, OSError):
                 pass
 
         self.current_processes = []
+
+        for log_file in self.log_files:
+            try:
+                log_file.close()
+            except Exception:
+                pass
+        self.log_files = []
 
         # ── Step 3: Targeted kills — only specific binary names ────
         kill_binaries = [
@@ -357,9 +631,22 @@ class TestRunner:
         for target in kill_binaries:
             try:
                 subprocess.run(
+                    ['pkill', '-15', target],
+                    stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL
+                )
+            except Exception:
+                pass
+
+        time.sleep(1)
+
+        for target in kill_binaries:
+            try:
+                result = subprocess.run(
                     ['pkill', '-9', target],
                     stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL
                 )
+                if result.returncode == 0:
+                    force_kill_used = True
             except Exception:
                 pass
 
@@ -376,36 +663,51 @@ class TestRunner:
                         if pid != MY_PID:
                             try:
                                 os.kill(pid, signal.SIGKILL)
+                                force_kill_used = True
                             except (ProcessLookupError, OSError):
                                 pass
             except Exception:
                 pass
 
-        # ── Step 4: Stop ROS2 daemon to clear DDS discovery state ──
-        try:
-            subprocess.run(
-                ['ros2', 'daemon', 'stop'],
-                stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
-                timeout=10
-            )
-        except Exception:
-            pass
+        # ── Step 4: Stop ROS2 daemon only after hard kills to clear DDS state ──
+        if force_kill_used:
+            try:
+                subprocess.run(
+                    ['ros2', 'daemon', 'stop'],
+                    stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
+                    timeout=10
+                )
+            except Exception:
+                pass
+
+            # Best-effort cleanup for stale FastDDS SHM lock files.
+            if shutil.which('fastdds'):
+                try:
+                    subprocess.run(
+                        ['fastdds', 'shm', 'clean', '-f'],
+                        stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
+                        timeout=10
+                    )
+                except Exception:
+                    pass
 
         print('[CLEANUP] All processes stopped')
 
         # ── Step 5: Wait for system to settle ──────────────────────
-        print('[CLEANUP] Waiting 15s for system to settle...')
-        time.sleep(15)
+        settle_seconds = 15 if force_kill_used else 5
+        print(f'[CLEANUP] Waiting {settle_seconds}s for system to settle...')
+        time.sleep(settle_seconds)
 
         # ── Step 6: Restart ROS2 daemon fresh ──────────────────────
-        try:
-            subprocess.run(
-                ['ros2', 'daemon', 'start'],
-                stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
-                timeout=10
-            )
-        except Exception:
-            pass
+        if force_kill_used:
+            try:
+                subprocess.run(
+                    ['ros2', 'daemon', 'start'],
+                    stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
+                    timeout=10
+                )
+            except Exception:
+                pass
 
         time.sleep(2)
         print('[CLEANUP] Ready for next scenario')
