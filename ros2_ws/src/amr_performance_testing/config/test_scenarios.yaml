@@ -106,5 +106,19 @@ scenarios:
       theta: 0.0
     timeout: 300
 
+  - name: "corridor_complex"
+    world: "corridor_complex.world"
+    launch: "corridor_complex.launch.py"
+    person_config: "corridor_complex.yaml"
+    start_pose:
+      x: -14.0
+      y: 0.0
+      theta: 0.0
+    goal_pose:
+      x: 25.738
+      y: -6.0
+      theta: 0.0
+    timeout: 300
+
 
   # Add more scenarios here...
