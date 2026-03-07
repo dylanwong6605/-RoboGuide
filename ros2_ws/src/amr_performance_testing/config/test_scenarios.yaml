@@ -106,5 +106,19 @@ scenarios:
       theta: 0.0
     timeout: 300
 
+  - name: "intersection_lobby"
+    world: "intersection_lobby.world"
+    launch: "intersection_lobby.launch.py"
+    person_config: "intersection_lobby.yaml"
+    start_pose:
+      x: -17.0
+      y: 0.0
+      theta: 0.0
+    goal_pose:
+      x: 5.0
+      y: 17.0
+      theta: 0.0
+    timeout: 300
+
 
   # Add more scenarios here...

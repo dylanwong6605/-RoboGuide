@@ -1,0 +1,40 @@
+persons:
+  - name: person_1
+    movement: back_and_forth
+    axis: x
+    speed: 0.8
+    distance: 3.0
+    start_offset: 0.0
+
+  - name: person_2
+    movement: random_walk
+    speed: 0.6
+    change_interval: 3.0
+
+  - name: person_3
+    movement: random_walk
+    speed: 0.6
+    change_interval: 2.5
+
+  - name: person_4
+    movement: random_walk
+    speed: 0.6
+    change_interval: 3.5
+
+  - name: person_5
+    movement: random_walk
+    speed: 0.6
+    change_interval: 2.0
+
+  - name: person_6
+    movement: stationary
+
+  - name: person_7
+    movement: stationary
+
+  - name: person_8
+    movement: back_and_forth
+    axis: x
+    speed: 0.7
+    distance: 4.0
+    start_offset: 0.0

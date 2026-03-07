@@ -1,0 +1,330 @@
+<?xml version="1.0"?>
+<sdf version="1.6">
+  <world name="custom_world">
+
+    <physics type="ode">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1</real_time_factor>
+      <real_time_update_rate>1000</real_time_update_rate>
+    </physics>
+
+    <light name="sun" type="directional">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation><range>1000</range><constant>0.9</constant>
+        <linear>0.01</linear><quadratic>0.001</quadratic></attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="col"><geometry><plane><normal>0 0 1</normal><size>100 100</size></plane></geometry></collision>
+        <visual name="vis"><geometry><plane><normal>0 0 1</normal><size>100 100</size></plane></geometry>
+          <material><ambient>0.8 0.8 0.8 1</ambient><diffuse>0.8 0.8 0.8 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- ================================================================
+         WALLS
+    ================================================================ -->
+
+    <model name="wall_1">
+      <static>true</static><pose>0.00 -20.00 1 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>4.30 0.30 2.0</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>4.30 0.30 2.0</size></box></geometry>
+          <material><ambient>0.75 0.75 0.85 1</ambient><diffuse>0.75 0.75 0.85 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <model name="wall_2">
+      <static>true</static><pose>-2.00 -13.50 1 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>0.30 13.30 2.0</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>0.30 13.30 2.0</size></box></geometry>
+          <material><ambient>0.75 0.75 0.85 1</ambient><diffuse>0.75 0.75 0.85 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <model name="wall_3">
+      <static>true</static><pose>2.00 -13.50 1 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>0.30 13.30 2.0</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>0.30 13.30 2.0</size></box></geometry>
+          <material><ambient>0.75 0.75 0.85 1</ambient><diffuse>0.75 0.75 0.85 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <model name="wall_4">
+      <static>true</static><pose>-5.00 -7.00 1 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>6.30 0.30 2.0</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>6.30 0.30 2.0</size></box></geometry>
+          <material><ambient>0.75 0.75 0.85 1</ambient><diffuse>0.75 0.75 0.85 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <model name="wall_5">
+      <static>true</static><pose>5.00 -7.00 1 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>6.30 0.30 2.0</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>6.30 0.30 2.0</size></box></geometry>
+          <material><ambient>0.75 0.75 0.85 1</ambient><diffuse>0.75 0.75 0.85 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <model name="wall_6">
+      <static>true</static><pose>-8.00 -5.00 1 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>0.30 4.30 2.0</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>0.30 4.30 2.0</size></box></geometry>
+          <material><ambient>0.75 0.75 0.85 1</ambient><diffuse>0.75 0.75 0.85 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <model name="wall_7">
+      <static>true</static><pose>8.00 -5.00 1 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>0.30 4.30 2.0</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>0.30 4.30 2.0</size></box></geometry>
+          <material><ambient>0.75 0.75 0.85 1</ambient><diffuse>0.75 0.75 0.85 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <model name="wall_8">
+      <static>true</static><pose>-5.00 -3.00 1 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>6.30 0.30 2.0</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>6.30 0.30 2.0</size></box></geometry>
+          <material><ambient>0.75 0.75 0.85 1</ambient><diffuse>0.75 0.75 0.85 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <model name="wall_9">
+      <static>true</static><pose>5.00 -3.00 1 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>6.30 0.30 2.0</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>6.30 0.30 2.0</size></box></geometry>
+          <material><ambient>0.75 0.75 0.85 1</ambient><diffuse>0.75 0.75 0.85 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <model name="wall_10">
+      <static>true</static><pose>-2.00 -0.50 1 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>0.30 5.30 2.0</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>0.30 5.30 2.0</size></box></geometry>
+          <material><ambient>0.75 0.75 0.85 1</ambient><diffuse>0.75 0.75 0.85 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <model name="wall_11">
+      <static>true</static><pose>2.00 -0.50 1 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>0.30 5.30 2.0</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>0.30 5.30 2.0</size></box></geometry>
+          <material><ambient>0.75 0.75 0.85 1</ambient><diffuse>0.75 0.75 0.85 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <model name="wall_12">
+      <static>true</static><pose>-5.50 2.00 1 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>7.30 0.30 2.0</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>7.30 0.30 2.0</size></box></geometry>
+          <material><ambient>0.75 0.75 0.85 1</ambient><diffuse>0.75 0.75 0.85 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <model name="wall_13">
+      <static>true</static><pose>5.50 2.00 1 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>7.30 0.30 2.0</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>7.30 0.30 2.0</size></box></geometry>
+          <material><ambient>0.75 0.75 0.85 1</ambient><diffuse>0.75 0.75 0.85 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <model name="wall_14">
+      <static>true</static><pose>-9.00 8.50 1 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>0.30 13.30 2.0</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>0.30 13.30 2.0</size></box></geometry>
+          <material><ambient>0.75 0.75 0.85 1</ambient><diffuse>0.75 0.75 0.85 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <model name="wall_15">
+      <static>true</static><pose>9.00 8.50 1 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>0.30 13.30 2.0</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>0.30 13.30 2.0</size></box></geometry>
+          <material><ambient>0.75 0.75 0.85 1</ambient><diffuse>0.75 0.75 0.85 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <model name="wall_16">
+      <static>true</static><pose>-3.00 15.00 1 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>12.30 0.30 2.0</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>12.30 0.30 2.0</size></box></geometry>
+          <material><ambient>0.75 0.75 0.85 1</ambient><diffuse>0.75 0.75 0.85 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <model name="wall_17">
+      <static>true</static><pose>8.00 15.00 1 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>2.30 0.30 2.0</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>2.30 0.30 2.0</size></box></geometry>
+          <material><ambient>0.75 0.75 0.85 1</ambient><diffuse>0.75 0.75 0.85 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <model name="wall_18">
+      <static>true</static><pose>3.00 17.00 1 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>0.30 4.30 2.0</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>0.30 4.30 2.0</size></box></geometry>
+          <material><ambient>0.75 0.75 0.85 1</ambient><diffuse>0.75 0.75 0.85 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <model name="wall_19">
+      <static>true</static><pose>7.00 17.00 1 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>0.30 4.30 2.0</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>0.30 4.30 2.0</size></box></geometry>
+          <material><ambient>0.75 0.75 0.85 1</ambient><diffuse>0.75 0.75 0.85 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- ================================================================
+         STATIC OBSTACLES
+    ================================================================ -->
+
+    <model name="desk">
+      <static>true</static><pose>-5.00 7.00 0.375 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>4.0 2.0 0.75</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>4.0 2.0 0.75</size></box></geometry>
+          <material><ambient>0.55 0.38 0.2 1</ambient><diffuse>0.55 0.38 0.2 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <model name="bench_1">
+      <static>true</static><pose>1.50 8.00 0.25 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>1.0 8.0 0.5</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>1.0 8.0 0.5</size></box></geometry>
+          <material><ambient>0.55 0.38 0.2 1</ambient><diffuse>0.55 0.38 0.2 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <model name="bench_2">
+      <static>true</static><pose>4.50 8.00 0.25 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>1.0 8.0 0.5</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>1.0 8.0 0.5</size></box></geometry>
+          <material><ambient>0.55 0.38 0.2 1</ambient><diffuse>0.55 0.38 0.2 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <model name="bench_3">
+      <static>true</static><pose>7.50 8.00 0.25 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>1.0 8.0 0.5</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>1.0 8.0 0.5</size></box></geometry>
+          <material><ambient>0.55 0.38 0.2 1</ambient><diffuse>0.55 0.38 0.2 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- ================================================================
+         PEOPLE — stand.dae + planar_move, static=false
+    ================================================================ -->
+
+    <model name="person_1">
+      <pose>1.00 -13.00 0 0 0 0</pose><static>false</static>
+      <link name="link">
+        <inertial><mass>5.0</mass><inertia><ixx>0.1</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.1</iyy><iyz>0</iyz><izz>0.1</izz></inertia></inertial>
+        <collision name="collision"><geometry><box><size>0.5 0.5 1.8</size></box></geometry><pose>0 0 0.9 0 0 0</pose></collision>
+        <visual name="visual"><pose>0 0 0 0 0 0</pose><geometry><mesh><uri>/usr/share/gazebo-11/media/models/stand.dae</uri><scale>1.0 1.0 1.0</scale></mesh></geometry></visual>
+      </link>
+      <plugin name="person_1_move" filename="libgazebo_ros_planar_move.so"><ros><namespace>person_1</namespace></ros><update_rate>50</update_rate><publish_odom>false</publish_odom><publish_odom_tf>false</publish_odom_tf></plugin>
+    </model>
+
+    <model name="person_2">
+      <pose>-2.00 -6.00 0 0 0 0</pose><static>false</static>
+      <link name="link">
+        <inertial><mass>5.0</mass><inertia><ixx>0.1</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.1</iyy><iyz>0</iyz><izz>0.1</izz></inertia></inertial>
+        <collision name="collision"><geometry><box><size>0.5 0.5 1.8</size></box></geometry><pose>0 0 0.9 0 0 0</pose></collision>
+        <visual name="visual"><pose>0 0 0 0 0 0</pose><geometry><mesh><uri>/usr/share/gazebo-11/media/models/stand.dae</uri><scale>1.0 1.0 1.0</scale></mesh></geometry></visual>
+      </link>
+      <plugin name="person_2_move" filename="libgazebo_ros_planar_move.so"><ros><namespace>person_2</namespace></ros><update_rate>50</update_rate><publish_odom>false</publish_odom><publish_odom_tf>false</publish_odom_tf></plugin>
+    </model>
+
+    <model name="person_3">
+      <pose>-1.00 -4.00 0 0 0 0</pose><static>false</static>
+      <link name="link">
+        <inertial><mass>5.0</mass><inertia><ixx>0.1</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.1</iyy><iyz>0</iyz><izz>0.1</izz></inertia></inertial>
+        <collision name="collision"><geometry><box><size>0.5 0.5 1.8</size></box></geometry><pose>0 0 0.9 0 0 0</pose></collision>
+        <visual name="visual"><pose>0 0 0 0 0 0</pose><geometry><mesh><uri>/usr/share/gazebo-11/media/models/stand.dae</uri><scale>1.0 1.0 1.0</scale></mesh></geometry></visual>
+      </link>
+      <plugin name="person_3_move" filename="libgazebo_ros_planar_move.so"><ros><namespace>person_3</namespace></ros><update_rate>50</update_rate><publish_odom>false</publish_odom><publish_odom_tf>false</publish_odom_tf></plugin>
+    </model>
+
+    <model name="person_4">
+      <pose>2.00 -6.00 0 0 0 0</pose><static>false</static>
+      <link name="link">
+        <inertial><mass>5.0</mass><inertia><ixx>0.1</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.1</iyy><iyz>0</iyz><izz>0.1</izz></inertia></inertial>
+        <collision name="collision"><geometry><box><size>0.5 0.5 1.8</size></box></geometry><pose>0 0 0.9 0 0 0</pose></collision>
+        <visual name="visual"><pose>0 0 0 0 0 0</pose><geometry><mesh><uri>/usr/share/gazebo-11/media/models/stand.dae</uri><scale>1.0 1.0 1.0</scale></mesh></geometry></visual>
+      </link>
+      <plugin name="person_4_move" filename="libgazebo_ros_planar_move.so"><ros><namespace>person_4</namespace></ros><update_rate>50</update_rate><publish_odom>false</publish_odom><publish_odom_tf>false</publish_odom_tf></plugin>
+    </model>
+
+    <model name="person_5">
+      <pose>2.00 -4.00 0 0 0 0</pose><static>false</static>
+      <link name="link">
+        <inertial><mass>5.0</mass><inertia><ixx>0.1</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.1</iyy><iyz>0</iyz><izz>0.1</izz></inertia></inertial>
+        <collision name="collision"><geometry><box><size>0.5 0.5 1.8</size></box></geometry><pose>0 0 0.9 0 0 0</pose></collision>
+        <visual name="visual"><pose>0 0 0 0 0 0</pose><geometry><mesh><uri>/usr/share/gazebo-11/media/models/stand.dae</uri><scale>1.0 1.0 1.0</scale></mesh></geometry></visual>
+      </link>
+      <plugin name="person_5_move" filename="libgazebo_ros_planar_move.so"><ros><namespace>person_5</namespace></ros><update_rate>50</update_rate><publish_odom>false</publish_odom><publish_odom_tf>false</publish_odom_tf></plugin>
+    </model>
+
+    <model name="person_6">
+      <pose>-5.00 4.00 0 0 0 0</pose><static>false</static>
+      <link name="link">
+        <inertial><mass>5.0</mass><inertia><ixx>0.1</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.1</iyy><iyz>0</iyz><izz>0.1</izz></inertia></inertial>
+        <collision name="collision"><geometry><box><size>0.5 0.5 1.8</size></box></geometry><pose>0 0 0.9 0 0 0</pose></collision>
+        <visual name="visual"><pose>0 0 0 0 0 0</pose><geometry><mesh><uri>/usr/share/gazebo-11/media/models/stand.dae</uri><scale>1.0 1.0 1.0</scale></mesh></geometry></visual>
+      </link>
+      <plugin name="person_6_move" filename="libgazebo_ros_planar_move.so"><ros><namespace>person_6</namespace></ros><update_rate>50</update_rate><publish_odom>false</publish_odom><publish_odom_tf>false</publish_odom_tf></plugin>
+    </model>
+
+    <model name="person_7">
+      <pose>-5.00 10.00 0 0 0 0</pose><static>false</static>
+      <link name="link">
+        <inertial><mass>5.0</mass><inertia><ixx>0.1</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.1</iyy><iyz>0</iyz><izz>0.1</izz></inertia></inertial>
+        <collision name="collision"><geometry><box><size>0.5 0.5 1.8</size></box></geometry><pose>0 0 0.9 0 0 0</pose></collision>
+        <visual name="visual"><pose>0 0 0 0 0 0</pose><geometry><mesh><uri>/usr/share/gazebo-11/media/models/stand.dae</uri><scale>1.0 1.0 1.0</scale></mesh></geometry></visual>
+      </link>
+      <plugin name="person_7_move" filename="libgazebo_ros_planar_move.so"><ros><namespace>person_7</namespace></ros><update_rate>50</update_rate><publish_odom>false</publish_odom><publish_odom_tf>false</publish_odom_tf></plugin>
+    </model>
+
+    <model name="person_8">
+      <pose>-1.00 6.00 0 0 0 0</pose><static>false</static>
+      <link name="link">
+        <inertial><mass>5.0</mass><inertia><ixx>0.1</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.1</iyy><iyz>0</iyz><izz>0.1</izz></inertia></inertial>
+        <collision name="collision"><geometry><box><size>0.5 0.5 1.8</size></box></geometry><pose>0 0 0.9 0 0 0</pose></collision>
+        <visual name="visual"><pose>0 0 0 0 0 0</pose><geometry><mesh><uri>/usr/share/gazebo-11/media/models/stand.dae</uri><scale>1.0 1.0 1.0</scale></mesh></geometry></visual>
+      </link>
+      <plugin name="person_8_move" filename="libgazebo_ros_planar_move.so"><ros><namespace>person_8</namespace></ros><update_rate>50</update_rate><publish_odom>false</publish_odom><publish_odom_tf>false</publish_odom_tf></plugin>
+    </model>
+
+  </world>
+</sdf>
