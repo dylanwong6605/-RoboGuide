@@ -106,5 +106,32 @@ scenarios:
       theta: 0.0
     timeout: 300
 
+  - name: "hospital_lobby"
+    world: "hospital_lobby.world"
+    launch: "hospital_lobby.launch.py"
+    person_config: "hospital_lobby.yaml"
+    start_pose:
+      x: 0.0
+      y: -4.5
+      theta: 0.0
+    goal_pose:
+      x: 8.0
+      y: 9.0
+      theta: 0.0
+    timeout: 120
+
+  - name: "hallway_long_warning"
+    world: "hallway_long_warning.world"
+    launch: "hallway_long_warning.launch.py"
+    person_config: "hallway_long_warning.yaml"
+    start_pose:
+      x: -2.5
+      y: -7.0
+      theta: 0.0
+    goal_pose:
+      x: 24.0
+      y: 2.5
+      theta: 0.0
+    timeout: 120
 
   # Add more scenarios here...

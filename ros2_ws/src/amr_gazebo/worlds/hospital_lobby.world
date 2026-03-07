@@ -241,8 +241,9 @@
           <pose>0 0 0.9 0 0 0</pose>
         </collision>
         <visual name="visual">
+          <pose>0 0 0.9 0 0 0</pose>
           <geometry>
-            <mesh><uri>/usr/share/gazebo-11/media/models/walk.dae</uri><scale>1.0 1.0 1.0</scale></mesh>
+            <mesh><uri>/usr/share/gazebo-11/media/models/stand.dae</uri><scale>1.0 1.0 1.0</scale></mesh>
           </geometry>
         </visual>
       </link>
@@ -267,8 +268,9 @@
           <pose>0 0 0.9 0 0 0</pose>
         </collision>
         <visual name="visual">
+          <pose>0 0 0.9 0 0 0</pose>
           <geometry>
-            <mesh><uri>/usr/share/gazebo-11/media/models/walk.dae</uri><scale>1.0 1.0 1.0</scale></mesh>
+            <mesh><uri>/usr/share/gazebo-11/media/models/stand.dae</uri><scale>1.0 1.0 1.0</scale></mesh>
           </geometry>
         </visual>
       </link>
@@ -293,8 +295,9 @@
           <pose>0 0 0.9 0 0 0</pose>
         </collision>
         <visual name="visual">
+          <pose>0 0 0.9 0 0 0</pose>
           <geometry>
-            <mesh><uri>/usr/share/gazebo-11/media/models/walk.dae</uri><scale>1.0 1.0 1.0</scale></mesh>
+            <mesh><uri>/usr/share/gazebo-11/media/models/stand.dae</uri><scale>1.0 1.0 1.0</scale></mesh>
           </geometry>
         </visual>
       </link>
