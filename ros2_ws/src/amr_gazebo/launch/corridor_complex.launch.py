@@ -20,7 +20,7 @@ def generate_launch_description():
 
 	world_arg = DeclareLaunchArgument(
 		'world',
-		default_value='hallway_crowded',
+		default_value='corridor_complex',
 		description='World file name (without .world extension)'
 	)
 
@@ -50,26 +50,14 @@ def generate_launch_description():
 		}]
 	)
 
-	spawn_x = -12.0
-	spawn_y = 0.0
-	spawn_z = 0.5
-	spawn_yaw = 0.0
-
 	spawn_entity = Node(
 		package='gazebo_ros',
 		executable='spawn_entity.py',
-		arguments=[
-			'-topic', 'robot_description',
-			'-entity', 'hospital_amr',
-			'-x', str(spawn_x),
-			'-y', str(spawn_y),
-			'-z', str(spawn_z),
-			'-Y', str(spawn_yaw),
-		],
+arguments=['-topic', 'robot_description', '-entity', 'hospital_amr','-x', '-14.0', '-y', '0.0', '-z', '0.5'],
 		output='screen'
 	)
 
-	map_file = os.path.join(pkg_nav, 'maps', 'hallway_crowded.yaml')
+	map_file = os.path.join(pkg_nav, 'maps', 'corridor_complex.yaml')
 
 	map_server = Node(
 		package='nav2_map_server',
@@ -89,19 +77,7 @@ def generate_launch_description():
 		executable='amcl',
 		name='amcl',
 		output='screen',
-		parameters=[
-			nav2_params,
-			{
-				'use_sim_time': use_sim_time,
-				'set_initial_pose': True,
-				'initial_pose': {
-					'x': spawn_x,
-					'y': spawn_y,
-					'z': 0.0,
-					'yaw': spawn_yaw,
-				},
-			},
-		]
+		parameters=[nav2_params, {'use_sim_time': use_sim_time}]
 	)
 
 	set_initial_pose = TimerAction(
@@ -111,7 +87,7 @@ def generate_launch_description():
 				cmd=[
 					'ros2', 'topic', 'pub', '--once', '/initialpose',
 					'geometry_msgs/msg/PoseWithCovarianceStamped',
-					'{"header": {"frame_id": "map"}, "pose": {"pose": {"position": {"x": -12.0, "y": 0.0, "z": 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": 0.0, "w": 1.0}}, "covariance": [0.25,0,0,0,0,0,0,0.25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.068]}}'
+					'{"header": {"frame_id": "map"}, "pose": {"pose": {"position": {"x": -14.0, "y": 0.0, "z": 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": 0.0, "w": 1.0}}, "covariance": [0.25,0,0,0,0,0,0,0.25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.068]}}'
 				],
 				output='screen'
 			)
@@ -219,8 +195,8 @@ def generate_launch_description():
 
 		map_server,
 		amcl,
-		set_initial_pose,
 		localization_lifecycle,
+		set_initial_pose,
 
 		nav2_bringup,
 

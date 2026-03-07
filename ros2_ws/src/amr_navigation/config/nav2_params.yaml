@@ -115,7 +115,7 @@ controller_server:
     min_x_velocity_threshold: 0.001
     min_y_velocity_threshold: 0.001
     min_theta_velocity_threshold: 0.001
-    failure_tolerance: 0.5            # was 0.3 — more tolerant before aborting
+    failure_tolerance: 0.5
     progress_checker_plugin: "progress_checker"
     current_goal_checker: "general_goal_checker"
     goal_checker_plugins: ["general_goal_checker"]
@@ -132,10 +132,6 @@ controller_server:
       xy_goal_tolerance: 0.25
       yaw_goal_tolerance: 1.0
 
-    # ── Switched from DWB to Regulated Pure Pursuit ──────────────────────────
-    # RPP is built for diff-drive: rotates cleanly in place when heading is
-    # wrong, then drives forward. DWB was arcing while turning which caused
-    # failed progress checks and the stop/recover/replan loop in the logs.
     FollowPath:
       plugin: "nav2_regulated_pure_pursuit_controller::RegulatedPurePursuitController"
       desired_linear_vel: 0.8
@@ -155,7 +151,7 @@ controller_server:
       use_cost_regulated_linear_velocity_scaling: false
       regulated_linear_scaling_min_radius: 0.9
       regulated_linear_scaling_min_speed: 0.25
-      use_rotate_to_heading: true         # KEY: rotates in place instead of arcing forward
+      use_rotate_to_heading: true
       allow_reversing: false
       rotate_to_heading_min_angle: 0.6
       max_angular_accel: 5.0
@@ -241,7 +237,7 @@ planner_server:
     planner_plugins: ["GridBased"]
     GridBased:
       plugin: "nav2_navfn_planner/NavfnPlanner"
-      tolerance: 1.0       # was 0.5 — more wiggle room to find a valid path
+      tolerance: 1.0
       use_astar: true
       allow_unknown: true
 

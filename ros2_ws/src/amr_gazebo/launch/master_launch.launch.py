@@ -1,6 +1,6 @@
 import os
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument
+from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument, TimerAction, ExecuteProcess
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
@@ -101,6 +101,20 @@ def generate_launch_description():
 					'yaw': spawn_yaw,
 				},
 			},
+		]
+	)
+
+	set_initial_pose = TimerAction(
+		period=15.0,
+		actions=[
+			ExecuteProcess(
+				cmd=[
+					'ros2', 'topic', 'pub', '--once', '/initialpose',
+					'geometry_msgs/msg/PoseWithCovarianceStamped',
+					'{"header": {"frame_id": "map"}, "pose": {"pose": {"position": {"x": 0.0, "y": 0.0, "z": 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": 0.0, "w": 1.0}}, "covariance": [0.25,0,0,0,0,0,0,0.25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.068]}}'
+				],
+				output='screen'
+			)
 		]
 	)
 
@@ -205,6 +219,7 @@ def generate_launch_description():
 
 		map_server,
 		amcl,
+		set_initial_pose,
 		localization_lifecycle,
 
 		nav2_bringup,

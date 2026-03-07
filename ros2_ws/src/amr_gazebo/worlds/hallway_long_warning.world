@@ -1,0 +1,351 @@
+<?xml version="1.0"?>
+<sdf version="1.6">
+  <world name="large_hallway">
+
+    <physics type="ode">
+      <max_step_size>0.01</max_step_size>
+      <real_time_factor>1</real_time_factor>
+      <real_time_update_rate>100</real_time_update_rate>
+    </physics>
+
+    <light name="sun" type="directional">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry><plane><normal>0 0 1</normal><size>100 100</size></plane></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>100 100</size></plane></geometry>
+          <material><ambient>0.8 0.8 0.8 1</ambient><diffuse>0.8 0.8 0.8 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!--
+      Walls:
+        right_wall_1:  (0,-8)  to (0,0)    center (0,  -4),   length 8,  vertical
+        bottom_wall_1: (0,0)   to (25,0)   center (12.5, 0),  length 25, horizontal
+        right_wall_2:  (25,0)  to (25,5)   center (25, 2.5),  length 5,  vertical
+        top_wall:      (25,5)  to (-5,5)   center (10, 5),    length 30, horizontal
+        left_wall:     (-5,5)  to (-5,-8)  center (-5, -1.5), length 13, vertical
+        bottom_wall_2: (-5,-8) to (0,-8)   center (-2.5, -8), length 5,  horizontal
+    -->
+
+    <!-- ── Walls ──────────────────────────────────────────────────────────── -->
+
+    <model name="right_wall_1">
+      <static>true</static>
+      <pose>0 -4 1.25 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.2 8 2.5</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.2 8 2.5</size></box></geometry>
+          <material><ambient>0.7 0.7 0.9 1</ambient><diffuse>0.7 0.7 0.9 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="bottom_wall_1">
+      <static>true</static>
+      <pose>12.5 0 1.25 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>25 0.2 2.5</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>25 0.2 2.5</size></box></geometry>
+          <material><ambient>0.7 0.7 0.9 1</ambient><diffuse>0.7 0.7 0.9 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="right_wall_2">
+      <static>true</static>
+      <pose>25 2.5 1.25 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.2 5 2.5</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.2 5 2.5</size></box></geometry>
+          <material><ambient>0.7 0.7 0.9 1</ambient><diffuse>0.7 0.7 0.9 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="top_wall">
+      <static>true</static>
+      <pose>10 5 1.25 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>30 0.2 2.5</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>30 0.2 2.5</size></box></geometry>
+          <material><ambient>0.7 0.7 0.9 1</ambient><diffuse>0.7 0.7 0.9 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="left_wall">
+      <static>true</static>
+      <pose>-5 -1.5 1.25 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.2 13 2.5</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.2 13 2.5</size></box></geometry>
+          <material><ambient>0.7 0.7 0.9 1</ambient><diffuse>0.7 0.7 0.9 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="bottom_wall_2">
+      <static>true</static>
+      <pose>-2.5 -8 1.25 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>5 0.2 2.5</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>5 0.2 2.5</size></box></geometry>
+          <material><ambient>0.7 0.7 0.9 1</ambient><diffuse>0.7 0.7 0.9 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ── Static obstacle boxes ─────────────────────────────────────────── -->
+
+    <!-- box1: 1x1 at center (-0.5, 0.5) -->
+    <model name="box1">
+      <static>true</static>
+      <pose>-0.5 0.5 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>1 1 1.0</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>1 1 1.0</size></box></geometry>
+          <material><ambient>0.8 0.3 0.3 1</ambient><diffuse>0.8 0.3 0.3 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- box2: 2x1 at center (5, 3.5) -->
+    <model name="box2">
+      <static>true</static>
+      <pose>5 3.5 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>2 1 1.0</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>2 1 1.0</size></box></geometry>
+          <material><ambient>0.3 0.6 0.8 1</ambient><diffuse>0.3 0.6 0.8 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ── Moving box (2x1) at center (15, 2) ────────────────────────────── -->
+
+    <model name="moving_box">
+      <pose>15 2 0.5 0 0 0</pose>
+      <static>false</static>
+      <link name="link">
+        <inertial>
+          <mass>10.0</mass>
+          <inertia><ixx>0.1</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.1</iyy><iyz>0</iyz><izz>0.1</izz></inertia>
+        </inertial>
+        <collision name="collision"><geometry><box><size>2 1 1.0</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>2 1 1.0</size></box></geometry>
+          <material><ambient>0.9 0.6 0.1 1</ambient><diffuse>0.9 0.6 0.1 1</diffuse></material>
+        </visual>
+      </link>
+      <plugin name="moving_box_planar_move" filename="libgazebo_ros_planar_move.so">
+        <ros><namespace>moving_box</namespace></ros>
+        <update_rate>50</update_rate>
+        <publish_odom>false</publish_odom>
+        <publish_odom_tf>false</publish_odom_tf>
+      </plugin>
+    </model>
+
+    <!-- ── Person 1 at (-4, -2) ──────────────────────────────────────────── -->
+
+    <model name="person_1">
+      <pose>-4 -2 0 0 0 0</pose>
+      <static>false</static>
+      <link name="link">
+        <inertial>
+          <mass>5.0</mass>
+          <inertia><ixx>0.1</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.1</iyy><iyz>0</iyz><izz>0.1</izz></inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry><box><size>0.5 0.5 1.8</size></box></geometry>
+          <pose>0 0 0.9 0 0 0</pose>
+        </collision>
+        <visual name="visual">
+          <pose>0 0 0.9 0 0 0</pose>
+          <geometry><mesh><uri>/usr/share/gazebo-11/media/models/walk.dae</uri><scale>1.0 1.0 1.0</scale></mesh></geometry>
+        </visual>
+      </link>
+      <plugin name="person_1_planar_move" filename="libgazebo_ros_planar_move.so">
+        <ros><namespace>person_1</namespace></ros>
+        <update_rate>50</update_rate>
+        <publish_odom>false</publish_odom>
+        <publish_odom_tf>false</publish_odom_tf>
+      </plugin>
+    </model>
+
+    <!-- ── Person 2 at (-4, 4) ───────────────────────────────────────────── -->
+
+    <model name="person_2">
+      <pose>-4 4 0 0 0 0</pose>
+      <static>false</static>
+      <link name="link">
+        <inertial>
+          <mass>5.0</mass>
+          <inertia><ixx>0.1</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.1</iyy><iyz>0</iyz><izz>0.1</izz></inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry><box><size>0.5 0.5 1.8</size></box></geometry>
+          <pose>0 0 0.9 0 0 0</pose>
+        </collision>
+        <visual name="visual">
+          <pose>0 0 0.9 0 0 0</pose>
+          <geometry><mesh><uri>/usr/share/gazebo-11/media/models/walk.dae</uri><scale>1.0 1.0 1.0</scale></mesh></geometry>
+        </visual>
+      </link>
+      <plugin name="person_2_planar_move" filename="libgazebo_ros_planar_move.so">
+        <ros><namespace>person_2</namespace></ros>
+        <update_rate>50</update_rate>
+        <publish_odom>false</publish_odom>
+        <publish_odom_tf>false</publish_odom_tf>
+      </plugin>
+    </model>
+
+    <!-- ── 8 random people in (0,0)-(25,5) excluding (8,1)-(15,3) ────────── -->
+
+    <!-- person_3 at (2, 1.5) -->
+    <model name="person_3">
+      <pose>2 1.5 0 0 0 0</pose>
+      <static>false</static>
+      <link name="link">
+        <inertial><mass>5.0</mass><inertia><ixx>0.1</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.1</iyy><iyz>0</iyz><izz>0.1</izz></inertia></inertial>
+        <collision name="collision"><geometry><box><size>0.5 0.5 1.8</size></box></geometry><pose>0 0 0.9 0 0 0</pose></collision>
+        <visual name="visual">
+          <pose>0 0 0.9 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>/usr/share/gazebo-11/media/models/stand.dae</uri>
+              <scale>1.0 1.0 1.0</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <plugin name="person_3_planar_move" filename="libgazebo_ros_planar_move.so">
+        <ros><namespace>person_3</namespace></ros><update_rate>50</update_rate><publish_odom>false</publish_odom><publish_odom_tf>false</publish_odom_tf>
+      </plugin>
+    </model>
+
+    <!-- person_4 at (4, 4) -->
+    <model name="person_4">
+      <pose>4 4 0 0 0 0</pose>
+      <static>false</static>
+      <link name="link">
+        <inertial><mass>5.0</mass><inertia><ixx>0.1</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.1</iyy><iyz>0</iyz><izz>0.1</izz></inertia></inertial>
+        <collision name="collision"><geometry><box><size>0.5 0.5 1.8</size></box></geometry><pose>0 0 0.9 0 0 0</pose></collision>
+        <visual name="visual"><pose>0 0 0.9 0 0 0</pose><geometry><mesh><uri>/usr/share/gazebo-11/media/models/walk.dae</uri><scale>1.0 1.0 1.0</scale></mesh></geometry></visual>
+      </link>
+      <plugin name="person_4_planar_move" filename="libgazebo_ros_planar_move.so">
+        <ros><namespace>person_4</namespace></ros><update_rate>50</update_rate><publish_odom>false</publish_odom><publish_odom_tf>false</publish_odom_tf>
+      </plugin>
+    </model>
+
+    <!-- person_5 at (6, 2) -->
+    <model name="person_5">
+      <pose>6 2 0 0 0 0</pose>
+      <static>false</static>
+      <link name="link">
+        <inertial><mass>5.0</mass><inertia><ixx>0.1</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.1</iyy><iyz>0</iyz><izz>0.1</izz></inertia></inertial>
+        <collision name="collision"><geometry><box><size>0.5 0.5 1.8</size></box></geometry><pose>0 0 0.9 0 0 0</pose></collision>
+        <visual name="visual"><pose>0 0 0.9 0 0 0</pose><geometry><mesh><uri>/usr/share/gazebo-11/media/models/walk.dae</uri><scale>1.0 1.0 1.0</scale></mesh></geometry></visual>
+      </link>
+      <plugin name="person_5_planar_move" filename="libgazebo_ros_planar_move.so">
+        <ros><namespace>person_5</namespace></ros><update_rate>50</update_rate><publish_odom>false</publish_odom><publish_odom_tf>false</publish_odom_tf>
+      </plugin>
+    </model>
+
+    <!-- person_6 at (16, 1.5) -->
+    <model name="person_6">
+      <pose>16 1.5 0 0 0 0</pose>
+      <static>false</static>
+      <link name="link">
+        <inertial><mass>5.0</mass><inertia><ixx>0.1</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.1</iyy><iyz>0</iyz><izz>0.1</izz></inertia></inertial>
+        <collision name="collision"><geometry><box><size>0.5 0.5 1.8</size></box></geometry><pose>0 0 0.9 0 0 0</pose></collision>
+        <visual name="visual"><pose>0 0 0.9 0 0 0</pose><geometry><mesh><uri>/usr/share/gazebo-11/media/models/walk.dae</uri><scale>1.0 1.0 1.0</scale></mesh></geometry></visual>
+      </link>
+      <plugin name="person_6_planar_move" filename="libgazebo_ros_planar_move.so">
+        <ros><namespace>person_6</namespace></ros><update_rate>50</update_rate><publish_odom>false</publish_odom><publish_odom_tf>false</publish_odom_tf>
+      </plugin>
+    </model>
+
+    <!-- person_7 at (18, 4) -->
+    <model name="person_7">
+      <pose>18 4 0 0 0 0</pose>
+      <static>false</static>
+      <link name="link">
+        <inertial><mass>5.0</mass><inertia><ixx>0.1</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.1</iyy><iyz>0</iyz><izz>0.1</izz></inertia></inertial>
+        <collision name="collision"><geometry><box><size>0.5 0.5 1.8</size></box></geometry><pose>0 0 0.9 0 0 0</pose></collision>
+        <visual name="visual"><pose>0 0 0.9 0 0 0</pose><geometry><mesh><uri>/usr/share/gazebo-11/media/models/walk.dae</uri><scale>1.0 1.0 1.0</scale></mesh></geometry></visual>
+      </link>
+      <plugin name="person_7_planar_move" filename="libgazebo_ros_planar_move.so">
+        <ros><namespace>person_7</namespace></ros><update_rate>50</update_rate><publish_odom>false</publish_odom><publish_odom_tf>false</publish_odom_tf>
+      </plugin>
+    </model>
+
+    <!-- person_8 at (20, 2) -->
+    <model name="person_8">
+      <pose>20 2 0 0 0 0</pose>
+      <static>false</static>
+      <link name="link">
+        <inertial><mass>5.0</mass><inertia><ixx>0.1</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.1</iyy><iyz>0</iyz><izz>0.1</izz></inertia></inertial>
+        <collision name="collision"><geometry><box><size>0.5 0.5 1.8</size></box></geometry><pose>0 0 0.9 0 0 0</pose></collision>
+        <visual name="visual"><pose>0 0 0.9 0 0 0</pose><geometry><mesh><uri>/usr/share/gazebo-11/media/models/walk.dae</uri><scale>1.0 1.0 1.0</scale></mesh></geometry></visual>
+      </link>
+      <plugin name="person_8_planar_move" filename="libgazebo_ros_planar_move.so">
+        <ros><namespace>person_8</namespace></ros><update_rate>50</update_rate><publish_odom>false</publish_odom><publish_odom_tf>false</publish_odom_tf>
+      </plugin>
+    </model>
+
+    <!-- person_9 at (22, 1) -->
+    <model name="person_9">
+      <pose>22 1 0 0 0 0</pose>
+      <static>false</static>
+      <link name="link">
+        <inertial><mass>5.0</mass><inertia><ixx>0.1</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.1</iyy><iyz>0</iyz><izz>0.1</izz></inertia></inertial>
+        <collision name="collision"><geometry><box><size>0.5 0.5 1.8</size></box></geometry><pose>0 0 0.9 0 0 0</pose></collision>
+        <visual name="visual"><pose>0 0 0.9 0 0 0</pose><geometry><mesh><uri>/usr/share/gazebo-11/media/models/walk.dae</uri><scale>1.0 1.0 1.0</scale></mesh></geometry></visual>
+      </link>
+      <plugin name="person_9_planar_move" filename="libgazebo_ros_planar_move.so">
+        <ros><namespace>person_9</namespace></ros><update_rate>50</update_rate><publish_odom>false</publish_odom><publish_odom_tf>false</publish_odom_tf>
+      </plugin>
+    </model>
+
+    <!-- person_10 at (23, 4) -->
+    <model name="person_10">
+      <pose>23 4 0 0 0 0</pose>
+      <static>false</static>
+      <link name="link">
+        <inertial><mass>5.0</mass><inertia><ixx>0.1</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.1</iyy><iyz>0</iyz><izz>0.1</izz></inertia></inertial>
+        <collision name="collision"><geometry><box><size>0.5 0.5 1.8</size></box></geometry><pose>0 0 0.9 0 0 0</pose></collision>
+        <visual name="visual"><pose>0 0 0.9 0 0 0</pose><geometry><mesh><uri>/usr/share/gazebo-11/media/models/walk.dae</uri><scale>1.0 1.0 1.0</scale></mesh></geometry></visual>
+      </link>
+      <plugin name="person_10_planar_move" filename="libgazebo_ros_planar_move.so">
+        <ros><namespace>person_10</namespace></ros><update_rate>50</update_rate><publish_odom>false</publish_odom><publish_odom_tf>false</publish_odom_tf>
+      </plugin>
+    </model>
+
+  </world>
+</sdf>
