@@ -76,21 +76,19 @@ persons:
     angle: 45
     distance: 3.0       # distance per leg before switching angle
 
-  # ── Bonus examples (commented out — uncomment to use) ─────────────────────
+  #Sways gently in place (good for a standing person)
+  - name: person_9
+    movement: oscillate
+    speed: 0.3
+    distance: 0.4
 
-  # Sways gently in place (good for a standing person)
-  # - name: person_9
-  #   movement: oscillate
-  #   speed: 0.3
-  #   distance: 0.4
+  #Sprints, pauses 2 seconds, reverses
+  - name: person_10
+    movement: sprint_and_pause
+    speed: 2.0
+    distance: 4.0
+    pause_duration: 2.0
 
-  # Sprints, pauses 2 seconds, reverses
-  # - name: person_10
-  #   movement: sprint_and_pause
-  #   speed: 2.0
-  #   distance: 4.0
-  #   pause_duration: 2.0
-
-  # Just stands still
-  # - name: person_11
-  #   movement: stationary
+  #Just stands still
+  - name: person_11
+    movement: stationary
