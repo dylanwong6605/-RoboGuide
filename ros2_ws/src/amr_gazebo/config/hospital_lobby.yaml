@@ -1,0 +1,10 @@
+persons:
+# Points are RELATIVE to where person_4 spawns in the world file.
+  - name: person_3
+    movement: waypoint
+    speed: 2.0
+    loop: reverse       # walks back through waypoints in reverse
+    points:
+      - [4, 2]          # move 6 m in X
+      - [4, 3]          # then 4 m in Y
+      - [4, 2]          # back to start
