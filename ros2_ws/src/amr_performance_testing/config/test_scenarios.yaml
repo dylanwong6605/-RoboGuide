@@ -111,8 +111,8 @@ scenarios:
     launch: "intersection_lobby.launch.py"
     person_config: "intersection_lobby.yaml"
     start_pose:
-      x: -17.0
-      y: 0.0
+      x: 0.0
+      y: -17.0
       theta: 0.0
     goal_pose:
       x: 5.0
@@ -125,8 +125,8 @@ scenarios:
     launch: "multiple_paths_bed.launch.py"
     person_config: "multiple_paths_bed.yaml"
     start_pose:
-      x: -17.0
-      y: 0.0
+      x: 0.0
+      y: -17.0
       theta: 0.0
     goal_pose:
       x: 3.0
@@ -139,8 +139,8 @@ scenarios:
     launch: "multiple_paths_arrow.launch.py"
     person_config: "multiple_paths_arrow.yaml"
     start_pose:
-      x: -17.0
-      y: 0.0
+      x: 0.0
+      y: -17.0
       theta: 0.0
     goal_pose:
       x: 0.0
