@@ -1,0 +1,218 @@
+import os
+
+from ament_index_python.packages import get_package_share_directory
+from launch import LaunchDescription
+from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument, SetEnvironmentVariable
+from launch.conditions import IfCondition
+from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.substitutions import LaunchConfiguration
+from launch_ros.actions import Node
+
+
+def generate_launch_description():
+    pkg_gazebo_ros = get_package_share_directory('gazebo_ros')
+    pkg_amr_gazebo = get_package_share_directory('amr_gazebo')
+    pkg_nav = get_package_share_directory('amr_navigation')
+
+    use_sim_time_arg = DeclareLaunchArgument(
+        'use_sim_time',
+        default_value='true',
+        description='Use simulation clock'
+    )
+
+    use_sim_time = LaunchConfiguration('use_sim_time')
+
+
+    models_path = os.path.join(pkg_amr_gazebo, 'models')
+    fuel_models_path = os.path.join(pkg_amr_gazebo, 'fuel_models')
+
+    set_gazebo_model_path = SetEnvironmentVariable(
+        'GAZEBO_MODEL_PATH',
+        models_path + ':' + fuel_models_path,
+    )
+
+    world_file = os.path.join(pkg_amr_gazebo, 'worlds', 'hospital_sector_north.world')
+
+    gazebo = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(pkg_gazebo_ros, 'launch', 'gazebo.launch.py')
+        ),
+        launch_arguments={'world': world_file}.items(),
+    )
+
+    urdf_file = os.path.join(pkg_amr_gazebo, 'urdf', 'hospital_amr.urdf')
+    with open(urdf_file, 'r') as file:
+        robot_desc = file.read()
+
+    robot_state_publisher = Node(
+        package='robot_state_publisher',
+        executable='robot_state_publisher',
+        name='robot_state_publisher',
+        output='screen',
+        parameters=[{'robot_description': robot_desc, 'use_sim_time': use_sim_time}],
+    )
+
+    spawn_x = 0.02
+    spawn_y = 14.0
+    spawn_z = 0.5
+    spawn_roll = 0.0
+    spawn_pitch = 0.0
+    spawn_yaw = 0.0
+
+    spawn_entity = Node(
+        package='gazebo_ros',
+        executable='spawn_entity.py',
+        arguments=[
+            '-topic', 'robot_description',
+            '-entity', 'hospital_amr',
+            '-x', str(spawn_x),
+            '-y', str(spawn_y),
+            '-z', str(spawn_z),
+            '-R', str(spawn_roll),
+            '-P', str(spawn_pitch),
+            '-Y', str(spawn_yaw),
+        ],
+        output='screen',
+    )
+
+    map_file = os.path.join(pkg_nav, 'maps', 'hospital_layout.yaml')
+
+    map_server = Node(
+        package='nav2_map_server',
+        executable='map_server',
+        name='map_server',
+        output='screen',
+        parameters=[{
+            'use_sim_time': use_sim_time,
+            'yaml_filename': map_file,
+        }]
+    )
+
+    nav2_params = os.path.join(pkg_nav, 'config', 'nav2_params.yaml')
+
+    amcl = Node(
+        package='nav2_amcl',
+        executable='amcl',
+        name='amcl',
+        output='screen',
+        parameters=[
+            nav2_params,
+            {
+                'use_sim_time': use_sim_time,
+                'set_initial_pose': True,
+                'initial_pose': {
+                    'x': spawn_x,
+                    'y': spawn_y,
+                    'z': 0.0,
+                    'yaw': spawn_yaw,
+                },
+            },
+        ]
+    )
+
+    localization_lifecycle = Node(
+        package='nav2_lifecycle_manager',
+        executable='lifecycle_manager',
+        name='lifecycle_manager_localization',
+        output='screen',
+        parameters=[{
+            'use_sim_time': use_sim_time,
+            'autostart': True,
+            'node_names': ['map_server', 'amcl'],
+        }]
+    )
+
+    nav2_bringup = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(pkg_nav, 'launch', 'nav2.launch.py')
+        ),
+        launch_arguments={
+            'use_sim_time': 'true',
+            'params_file': nav2_params,
+        }.items(),
+    )
+
+    yolo_node_0 = Node(
+        package='amr_perception',
+        executable='yolo_perception',
+        name='yolo_detector_0',
+        output='screen',
+        parameters=[{
+            'use_sim_time': use_sim_time,
+            'model_path': 'yolo26n.pt',
+            'image_topic': '/camera/image_raw',
+            'detections_topic': '/perception/detections',
+            'annotated_image_topic': '/perception/annotated_image',
+            'conf_threshold': 0.25,
+            'input_size': 640,
+            'use_fp16': True,
+            'worker_count': 2,
+            'worker_index': 0,
+            'publish_annotated': True,
+        }]
+    )
+
+    yolo_node_1 = Node(
+        package='amr_perception',
+        executable='yolo_perception',
+        name='yolo_detector_1',
+        output='screen',
+        parameters=[{
+            'use_sim_time': use_sim_time,
+            'model_path': 'yolo26n.pt',
+            'image_topic': '/camera/image_raw',
+            'detections_topic': '/perception/detections',
+            'annotated_image_topic': '/perception/annotated_image',
+            'conf_threshold': 0.25,
+            'input_size': 640,
+            'use_fp16': True,
+            'worker_count': 2,
+            'worker_index': 1,
+            'publish_annotated': False,
+        }]
+    )
+
+    yolo_reactive_controller = Node(
+        package='amr_perception',
+        executable='yolo_reactive_controller',
+        name='yolo_reactive_controller',
+        output='screen',
+        parameters=[{
+            'detections_topic': '/perception/detections',
+            'cmd_vel_topic': '/cmd_vel',
+            'person_class_id': 'person',
+            'min_score': 0.5,
+            'min_person_bbox_height_px': 80.0,
+            'hold_time': 0.5,
+        }]
+    )
+
+    rviz_config = os.path.join(
+        get_package_share_directory('nav2_bringup'),
+        'rviz',
+        'nav2_default_view.rviz'
+    )
+    rviz_node = Node(
+        package='rviz2',
+        executable='rviz2',
+        name='rviz2',
+        output='screen',
+        arguments=['-d', rviz_config],
+        parameters=[{'use_sim_time': use_sim_time}]
+    )
+
+    return LaunchDescription([
+        use_sim_time_arg,
+        set_gazebo_model_path,
+        gazebo,
+        robot_state_publisher,
+        spawn_entity,
+        map_server,
+        amcl,
+        localization_lifecycle,
+        nav2_bringup,
+        yolo_node_0,
+        yolo_node_1,
+        yolo_reactive_controller,
+        rviz_node,
+    ])

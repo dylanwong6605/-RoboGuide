@@ -120,6 +120,48 @@ scenarios:
       theta: 0.0
     timeout: 300
 
+  - name: "hospital_sector_north"
+    world: "hospital_sector_north.world"
+    launch: "hospital_sector_north.launch.py"
+    person_config: "hospital_sector_north.yaml"
+    start_pose:
+      x: 0.02
+      y: 14.0
+      theta: 0.0
+    goal_pose:
+      x: -2
+      y: -15
+      theta: 0.0
+    timeout: 200
+
+  - name: "hospital_sector_south"
+    world: "hospital_sector_south.world"
+    launch: "hospital_sector_south.launch.py"
+    person_config: "hospital_sector_south.yaml"
+    start_pose:
+      x: -0.5
+      y: 14.0
+      theta: 0.0
+    goal_pose:
+      x: 2
+      y: -24.6
+      theta: 0.0
+    timeout: 200
+
+  - name: "hospital_peak_shift_change"
+    world: "hospital_peak_shift_change.world"
+    launch: "hospital_peak_shift_change.launch.py"
+    person_config: "hospital_peak_shift_change.yaml"
+    start_pose:
+      x: 0.02
+      y: 14.0
+      theta: 0.0
+    goal_pose:
+      x: -9.04
+      y: -33.4
+      theta: 0.0
+    timeout: 300
+
   - name: "multiple_paths_bed"
     world: "multiple_paths_bed.world"
     launch: "multiple_paths_bed.launch.py"

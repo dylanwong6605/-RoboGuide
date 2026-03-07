@@ -1,0 +1,49 @@
+persons:
+  - name: patient_north_1
+    movement: random_walk
+    speed: 0.8
+    change_interval: 3.0
+
+  - name: patient_north_2
+    movement: random_walk
+    speed: 0.8
+    change_interval: 3.0
+
+  - name: patient_north_3
+    movement: back_and_forth
+    axis: x
+    speed: 0.9
+    distance: 3.0
+    start_offset: 1.8
+
+  - name: patient_north_4
+    movement: sprint_and_pause
+    speed: 1.2
+    distance: 2.0
+    pause_duration: 1.6
+
+  - name: patient_north_5
+    movement: random_walk
+    speed: 0.7
+    change_interval: 2.3
+
+  - name: patient_north_6
+    movement: back_and_forth
+    axis: y
+    speed: 0.9
+    distance: 5.0
+    start_offset: 1.8
+
+  - name: patient_north_7
+    movement: back_and_forth
+    axis: x
+    speed: 0.9
+    distance: 5.0
+    start_offset: 1.8
+
+  - name: patient_north_8
+    movement: back_and_forth
+    axis: y
+    speed: 0.75
+    distance: 5.0
+    start_offset: 0.5
