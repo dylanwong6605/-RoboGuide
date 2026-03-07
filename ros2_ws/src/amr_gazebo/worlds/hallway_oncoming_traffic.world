@@ -119,10 +119,10 @@
         </collision>
 
         <visual name="visual">
-          <pose>0 0 0 0 0 0</pose>
+          <pose>0 0 0.9 0 0 0</pose>
           <geometry>
             <mesh>
-              <uri>/usr/share/gazebo-11/media/models/walk.dae</uri>
+              <uri>/usr/share/gazebo-11/media/models/stand.dae</uri>
               <scale>1.0 1.0 1.0</scale>
             </mesh>
           </geometry>
@@ -160,10 +160,10 @@
         </collision>
 
         <visual name="visual">
-          <pose>0 0 0 0 0 0</pose>
+          <pose>0 0 0.9 0 0 0</pose>
           <geometry>
             <mesh>
-              <uri>/usr/share/gazebo-11/media/models/walk.dae</uri>
+              <uri>/usr/share/gazebo-11/media/models/stand.dae</uri>
               <scale>1.0 1.0 1.0</scale>
             </mesh>
           </geometry>

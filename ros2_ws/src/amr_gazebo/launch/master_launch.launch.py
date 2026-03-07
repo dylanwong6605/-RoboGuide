@@ -50,10 +50,22 @@ def generate_launch_description():
 		}]
 	)
 
+	spawn_x = 0.0
+	spawn_y = 0.0
+	spawn_z = 0.5
+	spawn_yaw = 0.0
+
 	spawn_entity = Node(
 		package='gazebo_ros',
 		executable='spawn_entity.py',
-		arguments=['-topic', 'robot_description', '-entity', 'hospital_amr', '-z', '0.5'],
+		arguments=[
+			'-topic', 'robot_description',
+			'-entity', 'hospital_amr',
+			'-x', str(spawn_x),
+			'-y', str(spawn_y),
+			'-z', str(spawn_z),
+			'-Y', str(spawn_yaw),
+		],
 		output='screen'
 	)
 
@@ -77,7 +89,19 @@ def generate_launch_description():
 		executable='amcl',
 		name='amcl',
 		output='screen',
-		parameters=[nav2_params, {'use_sim_time': use_sim_time}]
+		parameters=[
+			nav2_params,
+			{
+				'use_sim_time': use_sim_time,
+				'set_initial_pose': True,
+				'initial_pose': {
+					'x': spawn_x,
+					'y': spawn_y,
+					'z': 0.0,
+					'yaw': spawn_yaw,
+				},
+			},
+		]
 	)
 
 	localization_lifecycle = Node(

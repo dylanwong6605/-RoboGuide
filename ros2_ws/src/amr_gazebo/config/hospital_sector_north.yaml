@@ -1,0 +1,50 @@
+persons:
+  - name: patient_north_1
+    movement: back_and_forth
+    axis: x
+    speed: 0.8
+    distance: 6.0
+    start_offset: 0.0
+
+  - name: patient_north_2
+    movement: back_and_forth
+    axis: y
+    speed: 0.6
+    distance: 3.5
+    start_offset: 1.0
+
+  - name: patient_north_3
+    movement: zigzag
+    speed: 0.8
+    angle: 35.0
+    distance: 2.5
+
+  - name: patient_north_4
+    movement: sprint_and_pause
+    speed: 1.2
+    distance: 2.0
+    pause_duration: 1.6
+
+  - name: patient_north_5
+    movement: random_walk
+    speed: 0.7
+    change_interval: 2.3
+
+  - name: patient_north_6
+    movement: back_and_forth
+    axis: x
+    speed: 0.9
+    distance: 5.0
+    start_offset: 1.8
+
+  - name: patient_north_7
+    movement: oscillate
+    speed: 0.7
+    distance: 2.2
+
+  - name: patient_north_8
+    movement: diagonal
+    angle: -40.0
+    speed: 0.75
+    distance: 4.0
+    start_offset: 0.5

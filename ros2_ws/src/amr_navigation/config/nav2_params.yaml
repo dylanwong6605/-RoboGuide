@@ -39,10 +39,11 @@ amcl:
     z_short: 0.05
     scan_topic: scan
     set_initial_pose: true
-    initial_pose_x: 0.0
-    initial_pose_y: 0.0
-    initial_pose_z: 0.0
-    initial_pose_yaw: 0.0
+    initial_pose:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      yaw: 0.0
 
 bt_navigator:
   ros__parameters:
