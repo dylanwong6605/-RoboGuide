@@ -365,7 +365,7 @@
     </model>
 
     <model name="patient_north_3">
-      <pose>-0.6 6.0 0 0 0 0</pose>
+      <pose>-5.31 9.2 0 0 0 0</pose>
       <static>false</static>
       <link name="link">
         <inertial>
@@ -399,7 +399,7 @@
     </model>
 
     <model name="patient_north_4">
-      <pose>-1.4 3.2 0 0 0 0</pose>
+      <pose>4.31 3.2 0 0 0 0</pose>
       <static>false</static>
       <link name="link">
         <inertial>
@@ -467,7 +467,7 @@
     </model>
 
     <model name="patient_north_6">
-      <pose>-1.7 -3.2 0 0 0 0</pose>
+      <pose>-5.45 -3.2 0 0 0 0</pose>
       <static>false</static>
       <link name="link">
         <inertial>
@@ -535,7 +535,7 @@
     </model>
 
     <model name="patient_north_8">
-      <pose>-1.9 -11.0 0 0 0 0</pose>
+      <pose>5.1 -12.0 0 0 0 0</pose>
       <static>false</static>
       <link name="link">
         <inertial>

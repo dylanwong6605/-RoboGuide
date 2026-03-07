@@ -3,6 +3,7 @@ import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument, SetEnvironmentVariable
+from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
@@ -20,6 +21,7 @@ def generate_launch_description():
     )
 
     use_sim_time = LaunchConfiguration('use_sim_time')
+
 
     models_path = os.path.join(pkg_amr_gazebo, 'models')
     fuel_models_path = os.path.join(pkg_amr_gazebo, 'fuel_models')
@@ -50,7 +52,8 @@ def generate_launch_description():
         parameters=[{'robot_description': robot_desc, 'use_sim_time': use_sim_time}],
     )
 
-    spawn_x = -0.5
+    # Keep spawn consistent with other hospital scenarios.
+    spawn_x = 0.02
     spawn_y = 14.0
     spawn_z = 0.5
     spawn_roll = 0.0

@@ -22,12 +22,6 @@ def generate_launch_description():
 
     use_sim_time = LaunchConfiguration('use_sim_time')
 
-    enable_reactive_safety_arg = DeclareLaunchArgument(
-        'enable_reactive_safety',
-        default_value='false',
-        description='Enable YOLO-based reactive stop/yield controller on /cmd_vel'
-    )
-    enable_reactive_safety = LaunchConfiguration('enable_reactive_safety')
 
     models_path = os.path.join(pkg_amr_gazebo, 'models')
     fuel_models_path = os.path.join(pkg_amr_gazebo, 'fuel_models')
@@ -143,7 +137,6 @@ def generate_launch_description():
         executable='yolo_perception',
         name='yolo_detector_0',
         output='screen',
-        condition=IfCondition(enable_reactive_safety),
         parameters=[{
             'use_sim_time': use_sim_time,
             'model_path': 'yolo26n.pt',
@@ -164,7 +157,6 @@ def generate_launch_description():
         executable='yolo_perception',
         name='yolo_detector_1',
         output='screen',
-        condition=IfCondition(enable_reactive_safety),
         parameters=[{
             'use_sim_time': use_sim_time,
             'model_path': 'yolo26n.pt',
@@ -185,7 +177,6 @@ def generate_launch_description():
         executable='yolo_reactive_controller',
         name='yolo_reactive_controller',
         output='screen',
-        condition=IfCondition(enable_reactive_safety),
         parameters=[{
             'detections_topic': '/perception/detections',
             'cmd_vel_topic': '/cmd_vel',
@@ -212,7 +203,6 @@ def generate_launch_description():
 
     return LaunchDescription([
         use_sim_time_arg,
-        enable_reactive_safety_arg,
         set_gazebo_model_path,
         gazebo,
         robot_state_publisher,

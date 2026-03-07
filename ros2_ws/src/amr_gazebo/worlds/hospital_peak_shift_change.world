@@ -361,38 +361,150 @@
     </model>
 
     <model name="peak_10">
-      <pose>-6.9 -17.2 0 0 0 0</pose>
+      <pose>4.8 -17.2 0 0 0 0</pose>
       <static>false</static>
       <link name="link"><inertial><mass>5.0</mass><inertia><ixx>0.1</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.1</iyy><iyz>0</iyz><izz>0.1</izz></inertia></inertial><collision name="collision"><geometry><box><size>0.5 0.5 1.8</size></box></geometry><pose>0 0 0.9 0 0 0</pose></collision><visual name="visual"><pose>0 0 0.9 0 0 0</pose><geometry><mesh><uri>/usr/share/gazebo-11/media/models/stand.dae</uri><scale>1.0 1.0 1.0</scale></mesh></geometry></visual></link>
       <plugin name="peak_10_planar_move" filename="libgazebo_ros_planar_move.so"><ros><namespace>peak_10</namespace></ros><update_rate>50</update_rate><publish_odom>false</publish_odom><publish_odom_tf>false</publish_odom_tf></plugin>
     </model>
 
     <model name="peak_11">
-      <pose>-7.2 -20.8 0 0 0 0</pose>
+      <pose>-4.7 -20.8 0 0 0 0</pose>
       <static>false</static>
       <link name="link"><inertial><mass>5.0</mass><inertia><ixx>0.1</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.1</iyy><iyz>0</iyz><izz>0.1</izz></inertia></inertial><collision name="collision"><geometry><box><size>0.5 0.5 1.8</size></box></geometry><pose>0 0 0.9 0 0 0</pose></collision><visual name="visual"><pose>0 0 0.9 0 0 0</pose><geometry><mesh><uri>/usr/share/gazebo-11/media/models/stand.dae</uri><scale>1.0 1.0 1.0</scale></mesh></geometry></visual></link>
       <plugin name="peak_11_planar_move" filename="libgazebo_ros_planar_move.so"><ros><namespace>peak_11</namespace></ros><update_rate>50</update_rate><publish_odom>false</publish_odom><publish_odom_tf>false</publish_odom_tf></plugin>
     </model>
 
     <model name="peak_12">
-      <pose>-8.0 -24.0 0 0 0 0</pose>
+      <pose>4.6 -24.0 0 0 0 0</pose>
       <static>false</static>
       <link name="link"><inertial><mass>5.0</mass><inertia><ixx>0.1</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.1</iyy><iyz>0</iyz><izz>0.1</izz></inertia></inertial><collision name="collision"><geometry><box><size>0.5 0.5 1.8</size></box></geometry><pose>0 0 0.9 0 0 0</pose></collision><visual name="visual"><pose>0 0 0.9 0 0 0</pose><geometry><mesh><uri>/usr/share/gazebo-11/media/models/stand.dae</uri><scale>1.0 1.0 1.0</scale></mesh></geometry></visual></link>
       <plugin name="peak_12_planar_move" filename="libgazebo_ros_planar_move.so"><ros><namespace>peak_12</namespace></ros><update_rate>50</update_rate><publish_odom>false</publish_odom><publish_odom_tf>false</publish_odom_tf></plugin>
     </model>
 
     <model name="peak_13">
-      <pose>-8.6 -27.6 0 0 0 0</pose>
+      <pose>-4.5 -27.6 0 0 0 0</pose>
       <static>false</static>
       <link name="link"><inertial><mass>5.0</mass><inertia><ixx>0.1</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.1</iyy><iyz>0</iyz><izz>0.1</izz></inertia></inertial><collision name="collision"><geometry><box><size>0.5 0.5 1.8</size></box></geometry><pose>0 0 0.9 0 0 0</pose></collision><visual name="visual"><pose>0 0 0.9 0 0 0</pose><geometry><mesh><uri>/usr/share/gazebo-11/media/models/stand.dae</uri><scale>1.0 1.0 1.0</scale></mesh></geometry></visual></link>
       <plugin name="peak_13_planar_move" filename="libgazebo_ros_planar_move.so"><ros><namespace>peak_13</namespace></ros><update_rate>50</update_rate><publish_odom>false</publish_odom><publish_odom_tf>false</publish_odom_tf></plugin>
     </model>
 
     <model name="peak_14">
-      <pose>-8.9 -31.2 0 0 0 0</pose>
+      <pose>4.4 -31.2 0 0 0 0</pose>
       <static>false</static>
       <link name="link"><inertial><mass>5.0</mass><inertia><ixx>0.1</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.1</iyy><iyz>0</iyz><izz>0.1</izz></inertia></inertial><collision name="collision"><geometry><box><size>0.5 0.5 1.8</size></box></geometry><pose>0 0 0.9 0 0 0</pose></collision><visual name="visual"><pose>0 0 0.9 0 0 0</pose><geometry><mesh><uri>/usr/share/gazebo-11/media/models/stand.dae</uri><scale>1.0 1.0 1.0</scale></mesh></geometry></visual></link>
       <plugin name="peak_14_planar_move" filename="libgazebo_ros_planar_move.so"><ros><namespace>peak_14</namespace></ros><update_rate>50</update_rate><publish_odom>false</publish_odom><publish_odom_tf>false</publish_odom_tf></plugin>
+    </model>
+
+    <model name="peak_15">
+      <pose>5.0 13.6 0 0 0 0</pose>
+      <static>false</static>
+      <link name="link"><inertial><mass>5.0</mass><inertia><ixx>0.1</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.1</iyy><iyz>0</iyz><izz>0.1</izz></inertia></inertial><collision name="collision"><geometry><box><size>0.5 0.5 1.8</size></box></geometry><pose>0 0 0.9 0 0 0</pose></collision><visual name="visual"><pose>0 0 0.9 0 0 0</pose><geometry><mesh><uri>/usr/share/gazebo-11/media/models/stand.dae</uri><scale>1.0 1.0 1.0</scale></mesh></geometry></visual></link>
+      <plugin name="peak_15_planar_move" filename="libgazebo_ros_planar_move.so"><ros><namespace>peak_15</namespace></ros><update_rate>50</update_rate><publish_odom>false</publish_odom><publish_odom_tf>false</publish_odom_tf></plugin>
+    </model>
+
+    <model name="peak_16">
+      <pose>-5.0 10.0 0 0 0 0</pose>
+      <static>false</static>
+      <link name="link"><inertial><mass>5.0</mass><inertia><ixx>0.1</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.1</iyy><iyz>0</iyz><izz>0.1</izz></inertia></inertial><collision name="collision"><geometry><box><size>0.5 0.5 1.8</size></box></geometry><pose>0 0 0.9 0 0 0</pose></collision><visual name="visual"><pose>0 0 0.9 0 0 0</pose><geometry><mesh><uri>/usr/share/gazebo-11/media/models/stand.dae</uri><scale>1.0 1.0 1.0</scale></mesh></geometry></visual></link>
+      <plugin name="peak_16_planar_move" filename="libgazebo_ros_planar_move.so"><ros><namespace>peak_16</namespace></ros><update_rate>50</update_rate><publish_odom>false</publish_odom><publish_odom_tf>false</publish_odom_tf></plugin>
+    </model>
+
+    <model name="peak_17">
+      <pose>5.0 6.4 0 0 0 0</pose>
+      <static>false</static>
+      <link name="link"><inertial><mass>5.0</mass><inertia><ixx>0.1</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.1</iyy><iyz>0</iyz><izz>0.1</izz></inertia></inertial><collision name="collision"><geometry><box><size>0.5 0.5 1.8</size></box></geometry><pose>0 0 0.9 0 0 0</pose></collision><visual name="visual"><pose>0 0 0.9 0 0 0</pose><geometry><mesh><uri>/usr/share/gazebo-11/media/models/stand.dae</uri><scale>1.0 1.0 1.0</scale></mesh></geometry></visual></link>
+      <plugin name="peak_17_planar_move" filename="libgazebo_ros_planar_move.so"><ros><namespace>peak_17</namespace></ros><update_rate>50</update_rate><publish_odom>false</publish_odom><publish_odom_tf>false</publish_odom_tf></plugin>
+    </model>
+
+    <model name="peak_18">
+      <pose>-5.0 2.8 0 0 0 0</pose>
+      <static>false</static>
+      <link name="link"><inertial><mass>5.0</mass><inertia><ixx>0.1</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.1</iyy><iyz>0</iyz><izz>0.1</izz></inertia></inertial><collision name="collision"><geometry><box><size>0.5 0.5 1.8</size></box></geometry><pose>0 0 0.9 0 0 0</pose></collision><visual name="visual"><pose>0 0 0.9 0 0 0</pose><geometry><mesh><uri>/usr/share/gazebo-11/media/models/stand.dae</uri><scale>1.0 1.0 1.0</scale></mesh></geometry></visual></link>
+      <plugin name="peak_18_planar_move" filename="libgazebo_ros_planar_move.so"><ros><namespace>peak_18</namespace></ros><update_rate>50</update_rate><publish_odom>false</publish_odom><publish_odom_tf>false</publish_odom_tf></plugin>
+    </model>
+
+    <model name="peak_19">
+      <pose>5.0 -0.8 0 0 0 0</pose>
+      <static>false</static>
+      <link name="link"><inertial><mass>5.0</mass><inertia><ixx>0.1</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.1</iyy><iyz>0</iyz><izz>0.1</izz></inertia></inertial><collision name="collision"><geometry><box><size>0.5 0.5 1.8</size></box></geometry><pose>0 0 0.9 0 0 0</pose></collision><visual name="visual"><pose>0 0 0.9 0 0 0</pose><geometry><mesh><uri>/usr/share/gazebo-11/media/models/stand.dae</uri><scale>1.0 1.0 1.0</scale></mesh></geometry></visual></link>
+      <plugin name="peak_19_planar_move" filename="libgazebo_ros_planar_move.so"><ros><namespace>peak_19</namespace></ros><update_rate>50</update_rate><publish_odom>false</publish_odom><publish_odom_tf>false</publish_odom_tf></plugin>
+    </model>
+
+    <model name="peak_20">
+      <pose>-5.0 -6.0 0 0 0 0</pose>
+      <static>false</static>
+      <link name="link"><inertial><mass>5.0</mass><inertia><ixx>0.1</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.1</iyy><iyz>0</iyz><izz>0.1</izz></inertia></inertial><collision name="collision"><geometry><box><size>0.5 0.5 1.8</size></box></geometry><pose>0 0 0.9 0 0 0</pose></collision><visual name="visual"><pose>0 0 0.9 0 0 0</pose><geometry><mesh><uri>/usr/share/gazebo-11/media/models/stand.dae</uri><scale>1.0 1.0 1.0</scale></mesh></geometry></visual></link>
+      <plugin name="peak_20_planar_move" filename="libgazebo_ros_planar_move.so"><ros><namespace>peak_20</namespace></ros><update_rate>50</update_rate><publish_odom>false</publish_odom><publish_odom_tf>false</publish_odom_tf></plugin>
+    </model>
+
+    <model name="peak_21">
+      <pose>5.0 -11.2 0 0 0 0</pose>
+      <static>false</static>
+      <link name="link"><inertial><mass>5.0</mass><inertia><ixx>0.1</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.1</iyy><iyz>0</iyz><izz>0.1</izz></inertia></inertial><collision name="collision"><geometry><box><size>0.5 0.5 1.8</size></box></geometry><pose>0 0 0.9 0 0 0</pose></collision><visual name="visual"><pose>0 0 0.9 0 0 0</pose><geometry><mesh><uri>/usr/share/gazebo-11/media/models/stand.dae</uri><scale>1.0 1.0 1.0</scale></mesh></geometry></visual></link>
+      <plugin name="peak_21_planar_move" filename="libgazebo_ros_planar_move.so"><ros><namespace>peak_21</namespace></ros><update_rate>50</update_rate><publish_odom>false</publish_odom><publish_odom_tf>false</publish_odom_tf></plugin>
+    </model>
+
+    <model name="peak_22">
+      <pose>-5.0 -16.4 0 0 0 0</pose>
+      <static>false</static>
+      <link name="link"><inertial><mass>5.0</mass><inertia><ixx>0.1</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.1</iyy><iyz>0</iyz><izz>0.1</izz></inertia></inertial><collision name="collision"><geometry><box><size>0.5 0.5 1.8</size></box></geometry><pose>0 0 0.9 0 0 0</pose></collision><visual name="visual"><pose>0 0 0.9 0 0 0</pose><geometry><mesh><uri>/usr/share/gazebo-11/media/models/stand.dae</uri><scale>1.0 1.0 1.0</scale></mesh></geometry></visual></link>
+      <plugin name="peak_22_planar_move" filename="libgazebo_ros_planar_move.so"><ros><namespace>peak_22</namespace></ros><update_rate>50</update_rate><publish_odom>false</publish_odom><publish_odom_tf>false</publish_odom_tf></plugin>
+    </model>
+
+    <model name="peak_23">
+      <pose>5.0 -21.6 0 0 0 0</pose>
+      <static>false</static>
+      <link name="link"><inertial><mass>5.0</mass><inertia><ixx>0.1</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.1</iyy><iyz>0</iyz><izz>0.1</izz></inertia></inertial><collision name="collision"><geometry><box><size>0.5 0.5 1.8</size></box></geometry><pose>0 0 0.9 0 0 0</pose></collision><visual name="visual"><pose>0 0 0.9 0 0 0</pose><geometry><mesh><uri>/usr/share/gazebo-11/media/models/stand.dae</uri><scale>1.0 1.0 1.0</scale></mesh></geometry></visual></link>
+      <plugin name="peak_23_planar_move" filename="libgazebo_ros_planar_move.so"><ros><namespace>peak_23</namespace></ros><update_rate>50</update_rate><publish_odom>false</publish_odom><publish_odom_tf>false</publish_odom_tf></plugin>
+    </model>
+
+    <model name="peak_24">
+      <pose>-5.0 -27.2 0 0 0 0</pose>
+      <static>false</static>
+      <link name="link"><inertial><mass>5.0</mass><inertia><ixx>0.1</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.1</iyy><iyz>0</iyz><izz>0.1</izz></inertia></inertial><collision name="collision"><geometry><box><size>0.5 0.5 1.8</size></box></geometry><pose>0 0 0.9 0 0 0</pose></collision><visual name="visual"><pose>0 0 0.9 0 0 0</pose><geometry><mesh><uri>/usr/share/gazebo-11/media/models/stand.dae</uri><scale>1.0 1.0 1.0</scale></mesh></geometry></visual></link>
+      <plugin name="peak_24_planar_move" filename="libgazebo_ros_planar_move.so"><ros><namespace>peak_24</namespace></ros><update_rate>50</update_rate><publish_odom>false</publish_odom><publish_odom_tf>false</publish_odom_tf></plugin>
+    </model>
+
+    <model name="peak_25">
+      <pose>-1.4 13.7 0 0 0 0</pose>
+      <static>false</static>
+      <link name="link"><inertial><mass>5.0</mass><inertia><ixx>0.1</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.1</iyy><iyz>0</iyz><izz>0.1</izz></inertia></inertial><collision name="collision"><geometry><box><size>0.5 0.5 1.8</size></box></geometry><pose>0 0 0.9 0 0 0</pose></collision><visual name="visual"><pose>0 0 0.9 0 0 0</pose><geometry><mesh><uri>/usr/share/gazebo-11/media/models/stand.dae</uri><scale>1.0 1.0 1.0</scale></mesh></geometry></visual></link>
+      <plugin name="peak_25_planar_move" filename="libgazebo_ros_planar_move.so"><ros><namespace>peak_25</namespace></ros><update_rate>50</update_rate><publish_odom>false</publish_odom><publish_odom_tf>false</publish_odom_tf></plugin>
+    </model>
+
+    <model name="peak_26">
+      <pose>1.6 13.3 0 0 0 0</pose>
+      <static>false</static>
+      <link name="link"><inertial><mass>5.0</mass><inertia><ixx>0.1</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.1</iyy><iyz>0</iyz><izz>0.1</izz></inertia></inertial><collision name="collision"><geometry><box><size>0.5 0.5 1.8</size></box></geometry><pose>0 0 0.9 0 0 0</pose></collision><visual name="visual"><pose>0 0 0.9 0 0 0</pose><geometry><mesh><uri>/usr/share/gazebo-11/media/models/stand.dae</uri><scale>1.0 1.0 1.0</scale></mesh></geometry></visual></link>
+      <plugin name="peak_26_planar_move" filename="libgazebo_ros_planar_move.so"><ros><namespace>peak_26</namespace></ros><update_rate>50</update_rate><publish_odom>false</publish_odom><publish_odom_tf>false</publish_odom_tf></plugin>
+    </model>
+
+    <model name="peak_27">
+      <pose>-2.2 12.5 0 0 0 0</pose>
+      <static>false</static>
+      <link name="link"><inertial><mass>5.0</mass><inertia><ixx>0.1</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.1</iyy><iyz>0</iyz><izz>0.1</izz></inertia></inertial><collision name="collision"><geometry><box><size>0.5 0.5 1.8</size></box></geometry><pose>0 0 0.9 0 0 0</pose></collision><visual name="visual"><pose>0 0 0.9 0 0 0</pose><geometry><mesh><uri>/usr/share/gazebo-11/media/models/stand.dae</uri><scale>1.0 1.0 1.0</scale></mesh></geometry></visual></link>
+      <plugin name="peak_27_planar_move" filename="libgazebo_ros_planar_move.so"><ros><namespace>peak_27</namespace></ros><update_rate>50</update_rate><publish_odom>false</publish_odom><publish_odom_tf>false</publish_odom_tf></plugin>
+    </model>
+
+    <model name="peak_28">
+      <pose>2.4 11.9 0 0 0 0</pose>
+      <static>false</static>
+      <link name="link"><inertial><mass>5.0</mass><inertia><ixx>0.1</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.1</iyy><iyz>0</iyz><izz>0.1</izz></inertia></inertial><collision name="collision"><geometry><box><size>0.5 0.5 1.8</size></box></geometry><pose>0 0 0.9 0 0 0</pose></collision><visual name="visual"><pose>0 0 0.9 0 0 0</pose><geometry><mesh><uri>/usr/share/gazebo-11/media/models/stand.dae</uri><scale>1.0 1.0 1.0</scale></mesh></geometry></visual></link>
+      <plugin name="peak_28_planar_move" filename="libgazebo_ros_planar_move.so"><ros><namespace>peak_28</namespace></ros><update_rate>50</update_rate><publish_odom>false</publish_odom><publish_odom_tf>false</publish_odom_tf></plugin>
+    </model>
+
+    <model name="peak_29">
+      <pose>-0.8 11.2 0 0 0 0</pose>
+      <static>false</static>
+      <link name="link"><inertial><mass>5.0</mass><inertia><ixx>0.1</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.1</iyy><iyz>0</iyz><izz>0.1</izz></inertia></inertial><collision name="collision"><geometry><box><size>0.5 0.5 1.8</size></box></geometry><pose>0 0 0.9 0 0 0</pose></collision><visual name="visual"><pose>0 0 0.9 0 0 0</pose><geometry><mesh><uri>/usr/share/gazebo-11/media/models/stand.dae</uri><scale>1.0 1.0 1.0</scale></mesh></geometry></visual></link>
+      <plugin name="peak_29_planar_move" filename="libgazebo_ros_planar_move.so"><ros><namespace>peak_29</namespace></ros><update_rate>50</update_rate><publish_odom>false</publish_odom><publish_odom_tf>false</publish_odom_tf></plugin>
+    </model>
+
+    <model name="peak_30">
+      <pose>0.9 10.9 0 0 0 0</pose>
+      <static>false</static>
+      <link name="link"><inertial><mass>5.0</mass><inertia><ixx>0.1</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.1</iyy><iyz>0</iyz><izz>0.1</izz></inertia></inertial><collision name="collision"><geometry><box><size>0.5 0.5 1.8</size></box></geometry><pose>0 0 0.9 0 0 0</pose></collision><visual name="visual"><pose>0 0 0.9 0 0 0</pose><geometry><mesh><uri>/usr/share/gazebo-11/media/models/stand.dae</uri><scale>1.0 1.0 1.0</scale></mesh></geometry></visual></link>
+      <plugin name="peak_30_planar_move" filename="libgazebo_ros_planar_move.so"><ros><namespace>peak_30</namespace></ros><update_rate>50</update_rate><publish_odom>false</publish_odom><publish_odom_tf>false</publish_odom_tf></plugin>
     </model>
   </world>
 </sdf>

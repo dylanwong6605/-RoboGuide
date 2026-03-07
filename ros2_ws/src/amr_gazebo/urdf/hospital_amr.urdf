@@ -7,7 +7,7 @@
       <geometry>
         <box size="0.8 0.6 0.4"/>
       </geometry>
-      <origin xyz="0 0 0.2" rpy="0 0 0"/>
+      <origin xyz="0 0 0.28" rpy="0 0 0"/>
       <material name="blue">
         <color rgba="0.2 0.4 0.8 1.0"/>
       </material>
@@ -16,7 +16,7 @@
       <geometry>
         <box size="0.8 0.6 0.4"/>
       </geometry>
-      <origin xyz="0 0 0.2" rpy="0 0 0"/>
+      <origin xyz="0 0 0.28" rpy="0 0 0"/>
     </collision>
     <inertial>
       <mass value="30.0"/>
@@ -90,7 +90,7 @@
   <joint name="lidar_joint" type="fixed">
     <parent link="base_link"/>
     <child link="lidar_link"/>
-    <origin xyz="0 0 0.475" rpy="0 0 0"/>
+    <origin xyz="0 0 0.555" rpy="0 0 0"/>
   </joint>
 
   <!-- Left Wheel -->
@@ -211,8 +211,8 @@
       <publish_wheel_tf>true</publish_wheel_tf>
       <odometry_frame>odom</odometry_frame>
       <robot_base_frame>base_link</robot_base_frame>
-      <command_topic>cmd_vel</command_topic>
-      <odometry_topic>odom</odometry_topic>
+      <command_topic>/cmd_vel</command_topic>
+      <odometry_topic>/odom</odometry_topic>
     </plugin>
   </gazebo>
 
@@ -250,6 +250,7 @@
   <gazebo reference="lidar_link">
     <sensor type="ray" name="lidar">
       <pose>0 0 0 0 0 0</pose>
+      <always_on>true</always_on>
       <visualize>true</visualize>
       <update_rate>10</update_rate>
       <ray>
@@ -274,7 +275,7 @@
       </ray>
       <plugin name="lidar_controller" filename="libgazebo_ros_ray_sensor.so">
         <ros>
-          <remapping>~/out:=scan</remapping>
+          <remapping>~/out:=/scan</remapping>
         </ros>
         <output_type>sensor_msgs/LaserScan</output_type>
         <frame_name>lidar_link</frame_name>

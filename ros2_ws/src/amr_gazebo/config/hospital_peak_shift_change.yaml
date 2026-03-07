@@ -86,3 +86,83 @@ persons:
     speed: 1.05
     distance: 8.2
     start_offset: 2.1
+
+  - name: peak_15
+    movement: random_walk
+    speed: 0.72
+    change_interval: 1.8
+
+  - name: peak_16
+    movement: random_walk
+    speed: 0.78
+    change_interval: 2.1
+
+  - name: peak_17
+    movement: random_walk
+    speed: 0.8
+    change_interval: 2.3
+
+  - name: peak_18
+    movement: random_walk
+    speed: 0.74
+    change_interval: 1.9
+
+  - name: peak_19
+    movement: random_walk
+    speed: 0.83
+    change_interval: 2.0
+
+  - name: peak_20
+    movement: random_walk
+    speed: 0.76
+    change_interval: 2.4
+
+  - name: peak_21
+    movement: random_walk
+    speed: 0.82
+    change_interval: 2.2
+
+  - name: peak_22
+    movement: random_walk
+    speed: 0.7
+    change_interval: 2.6
+
+  - name: peak_23
+    movement: random_walk
+    speed: 0.79
+    change_interval: 2.1
+
+  - name: peak_24
+    movement: random_walk
+    speed: 0.73
+    change_interval: 2.5
+
+  - name: peak_25
+    movement: random_walk
+    speed: 0.65
+    change_interval: 1.6
+
+  - name: peak_26
+    movement: random_walk
+    speed: 0.68
+    change_interval: 1.8
+
+  - name: peak_27
+    movement: random_walk
+    speed: 0.62
+    change_interval: 1.7
+
+  - name: peak_28
+    movement: random_walk
+    speed: 0.7
+    change_interval: 1.9
+
+  - name: peak_29
+    movement: random_walk
+    speed: 0.64
+    change_interval: 1.6
+
+  - name: peak_30
+    movement: random_walk
+    speed: 0.66
+    change_interval: 1.8

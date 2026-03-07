@@ -18,28 +18,6 @@
       <uri>model://sun</uri>
     </include>
 
-    <model name="ground_plane_large">
-      <static>true</static>
-      <pose>0 0 -0.1 0 0 0</pose>
-      <link name="link">
-        <collision name="collision">
-          <geometry>
-            <plane>
-              <normal>0 0 1</normal>
-              <size>1000 1000</size>
-            </plane>
-          </geometry>
-        </collision>
-        <visual name="visual">
-          <geometry>
-            <plane>
-              <normal>0 0 1</normal>
-              <size>1000 1000</size>
-            </plane>
-          </geometry>
-        </visual>
-      </link>
-    </model>
 
     <model name="aws_robomaker_hospital_floor_01_floor_1">
       <include>
@@ -338,7 +316,7 @@
     </model>
 
     <model name="patient_south_1">
-      <pose>-0.2 -21.4 0 0 0 0</pose>
+      <pose>-0.1 11.3 0 0 0 0</pose>
       <static>false</static>
       <link name="link">
         <inertial>
@@ -372,7 +350,7 @@
     </model>
 
     <model name="patient_south_2">
-      <pose>0.4 -21.8 0 0 0 0</pose>
+      <pose>1.2 8.7 0 0 0 0</pose>
       <static>false</static>
       <link name="link">
         <inertial>
@@ -406,7 +384,7 @@
     </model>
 
     <model name="patient_south_3">
-      <pose>1.0 -22.2 0 0 0 0</pose>
+      <pose>-4.8 8.4 0 0 0 0</pose>
       <static>false</static>
       <link name="link">
         <inertial>
@@ -440,7 +418,7 @@
     </model>
 
     <model name="patient_south_4">
-      <pose>1.5 -22.7 0 0 0 0</pose>
+      <pose>3.7 2.9 0 0 0 0</pose>
       <static>false</static>
       <link name="link">
         <inertial>
@@ -474,7 +452,7 @@
     </model>
 
     <model name="patient_south_5">
-      <pose>0.8 -23.1 0 0 0 0</pose>
+      <pose>-1.4 -0.4 0 0 0 0</pose>
       <static>false</static>
       <link name="link">
         <inertial>
@@ -508,7 +486,7 @@
     </model>
 
     <model name="patient_south_6">
-      <pose>1.9 -23.6 0 0 0 0</pose>
+      <pose>-4.9 -3.8 0 0 0 0</pose>
       <static>false</static>
       <link name="link">
         <inertial>
@@ -542,7 +520,7 @@
     </model>
 
     <model name="patient_south_7">
-      <pose>0.3 -24.0 0 0 0 0</pose>
+      <pose>-0.6 -7.5 0 0 0 0</pose>
       <static>false</static>
       <link name="link">
         <inertial>
@@ -576,7 +554,7 @@
     </model>
 
     <model name="patient_south_8">
-      <pose>1.2 -24.3 0 0 0 0</pose>
+      <pose>4.4 -11.4 0 0 0 0</pose>
       <static>false</static>
       <link name="link">
         <inertial>
@@ -610,7 +588,7 @@
     </model>
 
     <model name="patient_south_9">
-      <pose>-0.4 -22.5 0 0 0 0</pose>
+      <pose>0.2 -16.8 0 0 0 0</pose>
       <static>false</static>
       <link name="link">
         <inertial>
@@ -644,7 +622,7 @@
     </model>
 
     <model name="patient_south_10">
-      <pose>2.2 -24.8 0 0 0 0</pose>
+      <pose>-0.3 -21.7 0 0 0 0</pose>
       <static>false</static>
       <link name="link">
         <inertial>
