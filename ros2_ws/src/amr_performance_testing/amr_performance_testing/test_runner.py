@@ -18,6 +18,7 @@ import os
 import signal
 import sys
 import csv
+import glob
 import argparse
 import re
 import math
@@ -669,7 +670,40 @@ class TestRunner:
             except Exception:
                 pass
 
-        # ── Step 4: Stop ROS2 daemon only after hard kills to clear DDS state ──
+        # ── Step 4: Clean up shared memory left by Gazebo ──────────
+        print('[CLEANUP] Clearing shared memory...')
+        try:
+            # Remove Gazebo/ROS shared memory semaphores
+            for shm_file in glob.glob('/dev/shm/sem.*'):
+                try:
+                    os.remove(shm_file)
+                except OSError:
+                    pass
+            # Remove other shared memory files
+            for shm_file in glob.glob('/dev/shm/*'):
+                try:
+                    os.remove(shm_file)
+                except OSError:
+                    pass
+        except Exception:
+            pass
+
+        # Also clean up /tmp gazebo files that accumulate
+        try:
+            for tmp_file in glob.glob('/tmp/gazebo-*'):
+                subprocess.run(
+                    ['rm', '-rf', tmp_file],
+                    stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL
+                )
+            for tmp_file in glob.glob('/tmp/ros2_*'):
+                subprocess.run(
+                    ['rm', '-rf', tmp_file],
+                    stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL
+                )
+        except Exception:
+            pass
+
+        # ── Step 5: Stop ROS2 daemon only after hard kills to clear DDS state ──
         if force_kill_used:
             try:
                 subprocess.run(
@@ -833,6 +867,19 @@ Examples:
                 sys.exit(0)
 
     print(f'\n[INFO] Will run all scenarios {num_runs} time(s)')
+
+    # ── Check shared memory ────────────────────────────────────────
+    try:
+        result = subprocess.run(['df', '-h', '/dev/shm'], capture_output=True, text=True)
+        print(f'[INFO] Shared memory status:')
+        for line in result.stdout.strip().split('\n'):
+            print(f'  {line}')
+        # Warn if shm is small
+        if '64M' in result.stdout:
+            print('[WARN] /dev/shm is only 64MB! Gazebo may crash after a few runs.')
+            print('[WARN] Restart container with: docker run --shm-size=4g ...')
+    except Exception:
+        pass
 
     # Create test runner
     runner = TestRunner(config_file, num_runs=num_runs)

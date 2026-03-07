@@ -3,6 +3,7 @@ services:
     build: .
     image: amr_hospital_guide:latest
     container_name: amr_dev
+    shm_size: '4g'
     stdin_open: true
     tty: true
     network_mode: host
