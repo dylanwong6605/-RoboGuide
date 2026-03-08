@@ -31,6 +31,7 @@ from datetime import datetime
 
 MAX_GOAL_RETRIES = 3
 RETRY_DELAY = 5.0
+GOAL_RESPONSE_TIMEOUT = 12.0
 
 
 class PerformanceLogger(Node):
@@ -62,7 +63,7 @@ class PerformanceLogger(Node):
         self.start_x = self.get_parameter('start_x').value
         self.start_y = self.get_parameter('start_y').value
         self.wait_for_action_server = bool(self.get_parameter('wait_for_action_server').value)
-        self.wait_for_nav2_lifecycle = bool(self.get_parameter('wait_for_nav2_lifecycle').value)
+        self.wait_for_nav2_lifecycle_enabled = bool(self.get_parameter('wait_for_nav2_lifecycle').value)
         self.amcl_settle_seconds = max(0.0, float(self.get_parameter('amcl_settle_seconds').value))
 
         # ── Metric Storage ────────────────────────────────────────
@@ -82,6 +83,7 @@ class PerformanceLogger(Node):
         self.planning_start_time = None
         self.goal_retries = 0
         self.results_saved = False
+        self.goal_response_timer = None
 
         # ── Subscribers ───────────────────────────────────────────
         self.odom_sub = self.create_subscription(
@@ -251,6 +253,10 @@ class PerformanceLogger(Node):
 
     def send_goal(self):
         """Send navigation goal and start tracking."""
+        if not self.nav_client.server_is_ready():
+            self._handle_goal_send_failure('navigate_to_pose action server not ready')
+            return
+
         goal_msg = NavigateToPose.Goal()
         goal_msg.pose.header.frame_id = 'map'
         goal_msg.pose.header.stamp = self.get_clock().now().to_msg()
@@ -266,33 +272,71 @@ class PerformanceLogger(Node):
         # Planning time starts from when we send the goal
         self.planning_start_time = time.time()
 
-        self.send_goal_future = self.nav_client.send_goal_async(
-            goal_msg,
-            feedback_callback=self.feedback_callback
+        try:
+            self.send_goal_future = self.nav_client.send_goal_async(
+                goal_msg,
+                feedback_callback=self.feedback_callback
+            )
+            self.send_goal_future.add_done_callback(self.goal_response_callback)
+
+            # Guard against silent hangs where no goal response callback arrives.
+            self.goal_response_timer = self.create_timer(
+                GOAL_RESPONSE_TIMEOUT,
+                self._on_goal_response_timeout,
+            )
+        except Exception as e:
+            self._handle_goal_send_failure(f'exception while sending goal: {e}')
+
+    def _cancel_goal_response_timer(self):
+        if self.goal_response_timer is not None:
+            try:
+                self.goal_response_timer.cancel()
+            except Exception:
+                pass
+            self.goal_response_timer = None
+
+    def _on_goal_response_timeout(self):
+        self._cancel_goal_response_timer()
+        self._handle_goal_send_failure(
+            f'no goal response received within {GOAL_RESPONSE_TIMEOUT:.1f}s'
         )
-        self.send_goal_future.add_done_callback(self.goal_response_callback)
+
+    def _handle_goal_send_failure(self, reason):
+        self.goal_retries += 1
+        self.get_logger().error(
+            f'Goal send/accept failed: {reason} '
+            f'(attempt {self.goal_retries}/{MAX_GOAL_RETRIES})'
+        )
+
+        if self.goal_retries < MAX_GOAL_RETRIES:
+            self.get_logger().info(f'Retrying in {RETRY_DELAY}s...')
+            self.retry_timer = self.create_timer(RETRY_DELAY, self._retry_goal_once)
+            return
+
+        self.get_logger().error(
+            f'All {MAX_GOAL_RETRIES} goal attempts failed before acceptance. Recording failure.'
+        )
+        self.success = False
+        self.start_time = time.time()
+        self.end_time = time.time()
+        self.save_results()
 
     def goal_response_callback(self, future):
         """Handle goal acceptance or rejection with retry logic."""
-        goal_handle = future.result()
+        self._cancel_goal_response_timer()
+
+        try:
+            goal_handle = future.result()
+        except Exception as e:
+            self._handle_goal_send_failure(f'goal response exception: {e}')
+            return
+
+        if goal_handle is None:
+            self._handle_goal_send_failure('goal response returned None')
+            return
 
         if not goal_handle.accepted:
-            self.goal_retries += 1
-            self.get_logger().error(
-                f'Goal rejected! (attempt {self.goal_retries}/{MAX_GOAL_RETRIES})'
-            )
-
-            if self.goal_retries < MAX_GOAL_RETRIES:
-                self.get_logger().info(f'Retrying in {RETRY_DELAY}s...')
-                self.retry_timer = self.create_timer(RETRY_DELAY, self._retry_goal_once)
-            else:
-                self.get_logger().error(
-                    f'All {MAX_GOAL_RETRIES} goal attempts rejected. Recording failure.'
-                )
-                self.success = False
-                self.start_time = time.time()
-                self.end_time = time.time()
-                self.save_results()
+            self._handle_goal_send_failure('goal rejected by action server')
             return
 
         # Goal accepted — NOW start tracking metrics
@@ -311,6 +355,7 @@ class PerformanceLogger(Node):
     def _retry_goal_once(self):
         """Timer callback to retry sending the goal. Fires once then cancels."""
         self.retry_timer.cancel()
+        self.retry_timer = None
         self.get_logger().info('Retrying goal...')
         self.send_goal()
 
@@ -432,7 +477,7 @@ def main(args=None):
         logger.get_logger().info('Skipping action server wait (configured)')
 
     # ── Phase 2: Optional wait for Nav2 lifecycle ACTIVE state ────
-    if logger.wait_for_nav2_lifecycle:
+    if logger.wait_for_nav2_lifecycle_enabled:
         nav2_ready = logger.wait_for_nav2_lifecycle(timeout=120.0)
         if not nav2_ready:
             logger.get_logger().error('Nav2 lifecycle nodes never became active!')
