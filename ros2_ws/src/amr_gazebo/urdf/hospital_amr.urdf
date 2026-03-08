@@ -5,7 +5,7 @@
   <link name="base_link">
     <visual>
       <geometry>
-        <box size="0.8 0.6 0.4"/>
+        <box size="0.8 0.45 0.4"/>
       </geometry>
       <origin xyz="0 0 0.28" rpy="0 0 0"/>
       <material name="blue">
@@ -14,9 +14,9 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.5 0.4 0.3"/>
+        <box size="0.8 0.45 0.4"/>
       </geometry>
-      <origin xyz="0 0 0.2" rpy="0 0 0"/>
+      <origin xyz="0 0 0.28" rpy="0 0 0"/>
     </collision>
     <inertial>
       <mass value="30.0"/>
@@ -31,7 +31,7 @@
   <link name="camera_link">
     <visual>
       <geometry>
-        <box size="0.12 0.2 0.12"/>
+        <box size="0.12 0.15 0.12"/>
       </geometry>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <material name="black">
@@ -40,7 +40,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.12 0.2 0.12"/>
+        <box size="0.12 0.15 0.12"/>
       </geometry>
       <origin xyz="0 0 0" rpy="0 0 0"/>
     </collision>
@@ -57,7 +57,7 @@
   <joint name="camera_joint" type="fixed">
     <parent link="base_link"/>
     <child link="camera_link"/>
-    <origin xyz="0.25 0 0.25" rpy="0 0 0"/>
+    <origin xyz="0.4 0 0.3" rpy="0 0 0"/>
   </joint>
 
   <!-- LIDAR Link (Bigger so you can see it!) -->
@@ -90,7 +90,7 @@
   <joint name="lidar_joint" type="fixed">
     <parent link="base_link"/>
     <child link="lidar_link"/>
-    <origin xyz="0 0 0.555" rpy="0 0 0"/>
+    <origin xyz="0 0 0.58" rpy="0 0 0"/>
   </joint>
 
   <!-- Left Wheel -->
@@ -123,7 +123,7 @@
   <joint name="left_wheel_joint" type="continuous">
     <parent link="base_link"/>
     <child link="left_wheel"/>
-    <origin xyz="0.1 0.22 0.15" rpy="0 0 0"/>
+    <origin xyz="0 0.255 0.15" rpy="0 0 0"/>
     <axis xyz="0 1 0"/>
   </joint>
 
@@ -157,7 +157,7 @@
   <joint name="right_wheel_joint" type="continuous">
     <parent link="base_link"/>
     <child link="right_wheel"/>
-    <origin xyz="0.1 -0.22 0.15" rpy="0 0 0"/>
+    <origin xyz="0 -0.255 0.15" rpy="0 0 0"/>
     <axis xyz="0 1 0"/>
   </joint>
 
@@ -191,7 +191,7 @@
   <joint name="caster_wheel_joint" type="fixed">
     <parent link="base_link"/>
     <child link="caster_wheel"/>
-    <origin xyz="-0.22 0 0.08" rpy="0 0 0"/>
+    <origin xyz="0.35 0 0.08" rpy="0 0 0"/>
   </joint>
 
   <!-- =============== GAZEBO PLUGINS =============== -->
@@ -202,10 +202,10 @@
       <update_rate>50</update_rate>
       <left_joint>left_wheel_joint</left_joint>
       <right_joint>right_wheel_joint</right_joint>
-      <wheel_separation>0.44</wheel_separation>
+      <wheel_separation>0.51</wheel_separation>
       <wheel_diameter>0.30</wheel_diameter>
-      <max_wheel_torque>2000</max_wheel_torque>
-      <max_wheel_acceleration>50.0</max_wheel_acceleration>
+      <max_wheel_torque>20</max_wheel_torque>
+      <max_wheel_acceleration>5.0</max_wheel_acceleration>
       <publish_odom>true</publish_odom>
       <publish_odom_tf>true</publish_odom_tf>
       <publish_wheel_tf>true</publish_wheel_tf>
@@ -277,6 +277,7 @@
         <ros>
           <remapping>~/out:=/scan</remapping>
         </ros>
+        <topic_name>/scan</topic_name>
         <output_type>sensor_msgs/LaserScan</output_type>
         <frame_name>lidar_link</frame_name>
       </plugin>

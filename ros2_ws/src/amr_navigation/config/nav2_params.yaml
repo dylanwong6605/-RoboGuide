@@ -312,6 +312,10 @@ lifecycle_manager:
   ros__parameters:
     use_sim_time: True
     autostart: true
+    # Startup under Gazebo + perception can be bursty; avoid false node-death resets.
+    bond_timeout: 15.0
+    attempt_respawn_reconnection: true
+    bond_respawn_max_duration: 45.0
     node_names:
       - amcl
       - map_server

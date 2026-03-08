@@ -129,8 +129,8 @@ scenarios:
       y: 14.0
       theta: 0.0
     goal_pose:
-      x: -2
-      y: -15
+      x: -2.0
+      y: -15.0
       theta: 0.0
     timeout: 200
 
@@ -143,7 +143,7 @@ scenarios:
       y: 14.0
       theta: 0.0
     goal_pose:
-      x: 2
+      x: 2.0
       y: -24.6
       theta: 0.0
     timeout: 200
