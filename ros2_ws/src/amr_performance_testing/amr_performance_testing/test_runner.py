@@ -562,7 +562,7 @@ class TestRunner:
                 '-p', f'start_x:={scenario["start_pose"]["x"]}',
                 '-p', f'start_y:={scenario["start_pose"]["y"]}',
                 # test_runner already performs Nav2/AMCL readiness checks.
-                '-p', 'wait_for_action_server:=false',
+                '-p', 'wait_for_action_server:=true',
                 '-p', 'wait_for_nav2_lifecycle:=false',
                 '-p', 'amcl_settle_seconds:=0.0',
             ]
