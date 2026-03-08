@@ -46,7 +46,7 @@ NAV2_MANAGED_ACTIVE_RE = re.compile(
 class TestRunner:
     """Manages automated performance testing across multiple scenarios."""
 
-    def __init__(self, config_file, num_runs=1, headless=False):
+    def __init__(self, config_file, num_runs=1, headless=False, disable_process_logs=False):
         self.config_file = config_file
         self.scenarios = []
         self.current_processes = []
@@ -54,6 +54,7 @@ class TestRunner:
         self.results_dir = '/ros2_ws/test_results'
         self.num_runs = num_runs
         self.headless = headless
+        self.disable_process_logs = disable_process_logs
         self._results_cache_mtime = None
         self._results_cache_rows = {}
 
@@ -128,6 +129,9 @@ class TestRunner:
 
     def _open_process_log(self, process_name, scenario_name=None, run_number=None):
         """Open a log file for a spawned process and keep the handle for cleanup."""
+        if self.disable_process_logs:
+            return subprocess.DEVNULL, None
+
         logs_dir = os.path.join(self.results_dir, 'process_logs')
         os.makedirs(logs_dir, exist_ok=True)
 
@@ -212,7 +216,10 @@ class TestRunner:
                 preexec_fn=os.setsid
             )
             self.current_processes.append(process)
-            print(f'[MOVER] target_mover.py started (PID {process.pid}) | log: {log_path}')
+            if log_path:
+                print(f'[MOVER] target_mover.py started (PID {process.pid}) | log: {log_path}')
+            else:
+                print(f'[MOVER] target_mover.py started (PID {process.pid})')
             return process
         except Exception as e:
             print(f'[MOVER][ERROR] Failed to launch target_mover.py: {e}')
@@ -509,7 +516,10 @@ class TestRunner:
                 env=launch_env,
             )
             self.current_processes.append(launch_process)
-            print(f'[LAUNCH] amr_gazebo launch started (PID {launch_process.pid}) | log: {launch_log_path}')
+            if launch_log_path:
+                print(f'[LAUNCH] amr_gazebo launch started (PID {launch_process.pid}) | log: {launch_log_path}')
+            else:
+                print(f'[LAUNCH] amr_gazebo launch started (PID {launch_process.pid})')
 
             if self.headless:
                 # Launch files start rviz2/gzclient unconditionally; stop them for headless throughput.
@@ -562,7 +572,7 @@ class TestRunner:
                 '-p', f'start_x:={scenario["start_pose"]["x"]}',
                 '-p', f'start_y:={scenario["start_pose"]["y"]}',
                 # test_runner already performs Nav2/AMCL readiness checks.
-                '-p', 'wait_for_action_server:=false',
+                '-p', 'wait_for_action_server:=true',
                 '-p', 'wait_for_nav2_lifecycle:=false',
                 '-p', 'amcl_settle_seconds:=0.0',
             ]
@@ -578,7 +588,10 @@ class TestRunner:
                 preexec_fn=os.setsid
             )
             self.current_processes.append(logger_process)
-            print(f'[LAUNCH] performance_logger started (PID {logger_process.pid}) | log: {logger_log_path}')
+            if logger_log_path:
+                print(f'[LAUNCH] performance_logger started (PID {logger_process.pid}) | log: {logger_log_path}')
+            else:
+                print(f'[LAUNCH] performance_logger started (PID {logger_process.pid})')
 
             # Wait for completion or timeout
             print(f'[RUNNING] Test in progress (timeout: {scenario["timeout"]}s)...')
@@ -922,6 +935,10 @@ Examples:
         '--headless', '--no-gui', action='store_true',
         help='Disable Gazebo and RViz GUI windows for faster batch testing'
     )
+    parser.add_argument(
+        '--disable-process-logs', action='store_true',
+        help='Disable per-process log files under test_results/process_logs'
+    )
     args = parser.parse_args()
 
     print('='*70)
@@ -955,6 +972,8 @@ Examples:
     print(f'\n[INFO] Will run all scenarios {num_runs} time(s)')
     if args.headless:
         print('[INFO] Headless mode enabled (no GUI)')
+    if args.disable_process_logs:
+        print('[INFO] Process logs disabled')
 
     # ── Check shared memory ────────────────────────────────────────
     try:
@@ -970,7 +989,12 @@ Examples:
         pass
 
     # Create test runner
-    runner = TestRunner(config_file, num_runs=num_runs, headless=args.headless)
+    runner = TestRunner(
+        config_file,
+        num_runs=num_runs,
+        headless=args.headless,
+        disable_process_logs=args.disable_process_logs,
+    )
 
     # Setup signal handler for clean exit
     def signal_handler(sig, frame):
