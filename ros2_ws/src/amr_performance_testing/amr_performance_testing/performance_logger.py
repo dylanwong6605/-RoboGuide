@@ -48,6 +48,9 @@ class PerformanceLogger(Node):
         self.declare_parameter('goal_y', 0.0)
         self.declare_parameter('start_x', 0.0)
         self.declare_parameter('start_y', 0.0)
+        self.declare_parameter('wait_for_action_server', True)
+        self.declare_parameter('wait_for_nav2_lifecycle', True)
+        self.declare_parameter('amcl_settle_seconds', 10.0)
 
         self.scenario_name = self.get_parameter('scenario_name').value
         self.run_number = self.get_parameter('run_number').value
@@ -58,6 +61,9 @@ class PerformanceLogger(Node):
         self.goal_y = self.get_parameter('goal_y').value
         self.start_x = self.get_parameter('start_x').value
         self.start_y = self.get_parameter('start_y').value
+        self.wait_for_action_server = bool(self.get_parameter('wait_for_action_server').value)
+        self.wait_for_nav2_lifecycle = bool(self.get_parameter('wait_for_nav2_lifecycle').value)
+        self.amcl_settle_seconds = max(0.0, float(self.get_parameter('amcl_settle_seconds').value))
 
         # ── Metric Storage ────────────────────────────────────────
         self.start_time = None
@@ -412,29 +418,40 @@ def main(args=None):
     rclpy.init(args=args)
     logger = PerformanceLogger()
 
-    # ── Phase 1: Wait for Nav2 action server to exist ─────────────
-    logger.get_logger().info('Waiting for navigate_to_pose action server...')
-    if not logger.nav_client.wait_for_server(timeout_sec=60.0):
-        logger.get_logger().error('Action server not available after 60s!')
-        logger.success = False
-        logger.start_time = time.time()
-        logger.end_time = time.time()
-        logger.save_results()
-        return
+    # ── Phase 1: Optional wait for Nav2 action server ─────────────
+    if logger.wait_for_action_server:
+        logger.get_logger().info('Waiting for navigate_to_pose action server...')
+        if not logger.nav_client.wait_for_server(timeout_sec=60.0):
+            logger.get_logger().error('Action server not available after 60s!')
+            logger.success = False
+            logger.start_time = time.time()
+            logger.end_time = time.time()
+            logger.save_results()
+            return
+    else:
+        logger.get_logger().info('Skipping action server wait (configured)')
 
-    # ── Phase 2: Wait for Nav2 lifecycle nodes to be ACTIVE ───────
-    nav2_ready = logger.wait_for_nav2_lifecycle(timeout=120.0)
-    if not nav2_ready:
-        logger.get_logger().error('Nav2 lifecycle nodes never became active!')
-        logger.success = False
-        logger.start_time = time.time()
-        logger.end_time = time.time()
-        logger.save_results()
-        return
+    # ── Phase 2: Optional wait for Nav2 lifecycle ACTIVE state ────
+    if logger.wait_for_nav2_lifecycle:
+        nav2_ready = logger.wait_for_nav2_lifecycle(timeout=120.0)
+        if not nav2_ready:
+            logger.get_logger().error('Nav2 lifecycle nodes never became active!')
+            logger.success = False
+            logger.start_time = time.time()
+            logger.end_time = time.time()
+            logger.save_results()
+            return
+    else:
+        logger.get_logger().info('Skipping Nav2 lifecycle wait (configured)')
 
-    # ── Phase 3: Extra settle time for AMCL particle convergence ──
-    logger.get_logger().info('Waiting 10s for AMCL to converge...')
-    time.sleep(10.0)
+    # ── Phase 3: Optional settle time for AMCL convergence ────────
+    if logger.amcl_settle_seconds > 0.0:
+        logger.get_logger().info(
+            f'Waiting {logger.amcl_settle_seconds:.1f}s for AMCL to converge...'
+        )
+        time.sleep(logger.amcl_settle_seconds)
+    else:
+        logger.get_logger().info('Skipping AMCL settle delay (configured)')
 
     # ── Phase 4: Send the navigation goal ─────────────────────────
     logger.send_goal()

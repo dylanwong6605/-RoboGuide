@@ -24,6 +24,9 @@ class YoloReactiveController(Node):
         self.declare_parameter("person_class_id", "person")
         self.declare_parameter("min_score", 0.5)
         self.declare_parameter("min_person_bbox_height_px", 0.0)
+        self.declare_parameter("max_stop_distance_m", 1.0)
+        self.declare_parameter("person_height_m", 1.7)
+        self.declare_parameter("camera_focal_length_px", 0.0)
         self.declare_parameter("reaction_mode", "stop")  # stop | yield
         self.declare_parameter("yield_linear_x", 0.08)
         self.declare_parameter("yield_angular_z", 0.6)
@@ -44,6 +47,17 @@ class YoloReactiveController(Node):
         )
         self._min_person_bbox_height_px = (
             self.get_parameter("min_person_bbox_height_px")
+            .get_parameter_value()
+            .double_value
+        )
+        self._max_stop_distance_m = (
+            self.get_parameter("max_stop_distance_m").get_parameter_value().double_value
+        )
+        self._person_height_m = (
+            self.get_parameter("person_height_m").get_parameter_value().double_value
+        )
+        self._camera_focal_length_px = (
+            self.get_parameter("camera_focal_length_px")
             .get_parameter_value()
             .double_value
         )
@@ -88,13 +102,14 @@ class YoloReactiveController(Node):
         self.get_logger().info(
             "YOLO Reactive Controller started. Listening on '%s', publishing stop "
             "or yield commands on '%s' when '%s' detected with score >= %.2f, "
-            "bbox_height >= %.1f px, mode=%s"
+            "bbox_height >= %.1f px, max_stop_distance=%.2fm, mode=%s"
             % (
                 detections_topic,
                 cmd_vel_topic,
                 self._person_class_id,
                 self._min_score,
                 self._min_person_bbox_height_px,
+                self._max_stop_distance_m,
                 self._reaction_mode,
             )
         )
@@ -102,9 +117,9 @@ class YoloReactiveController(Node):
     def _on_detections(self, msg: Detection2DArray) -> None:
         """Callback for YOLO detections.
 
-        If any detection matches the configured person class and score
-        threshold, record the current time so the timer callback will publish
-        a stop command.
+        If any detection matches class/score and is estimated within the
+        configured stop distance, record current time so timer callback
+        publishes stop/yield command.
         """
 
         found_person = False
@@ -113,26 +128,60 @@ class YoloReactiveController(Node):
                 class_id = result.hypothesis.class_id
                 score = float(result.hypothesis.score)
                 bbox_height_px = float(detection.bbox.size_y)
-                passes_distance_gate = (
+                passes_bbox_gate = (
                     self._min_person_bbox_height_px <= 0.0
                     or bbox_height_px >= self._min_person_bbox_height_px
                 )
+                estimated_distance_m = self._estimate_person_distance_m(bbox_height_px)
+                if estimated_distance_m is not None:
+                    passes_distance_gate = (
+                        estimated_distance_m <= self._max_stop_distance_m
+                    )
+                else:
+                    # Fallback when focal length is not configured.
+                    passes_distance_gate = passes_bbox_gate
+
                 if (
                     class_id == self._person_class_id
                     and score >= self._min_score
+                    and passes_bbox_gate
                     and passes_distance_gate
                 ):
                     found_person = True
-                    self.get_logger().info(
-                        f"[DETECTION] Person detected! class={class_id}, "
-                        f"score={score:.2f}, bbox_height={bbox_height_px:.1f}px"
-                    )
+                    if estimated_distance_m is not None:
+                        self.get_logger().info(
+                            f"[DETECTION] Person within range! class={class_id}, "
+                            f"score={score:.2f}, bbox_height={bbox_height_px:.1f}px, "
+                            f"distance~{estimated_distance_m:.2f}m"
+                        )
+                    else:
+                        self.get_logger().info(
+                            f"[DETECTION] Person detected (distance est disabled). "
+                            f"class={class_id}, score={score:.2f}, "
+                            f"bbox_height={bbox_height_px:.1f}px"
+                        )
                     break
             if found_person:
                 break
 
         if found_person:
             self._last_person_time = self.get_clock().now()
+
+    def _estimate_person_distance_m(self, bbox_height_px: float):
+        """Estimate person distance from bbox height using pinhole camera model.
+
+        distance ~= (focal_length_px * person_height_m) / bbox_height_px
+        Returns None when estimation is unavailable.
+        """
+
+        if (
+            self._camera_focal_length_px <= 0.0
+            or self._person_height_m <= 0.0
+            or bbox_height_px <= 1.0
+        ):
+            return None
+
+        return (self._camera_focal_length_px * self._person_height_m) / bbox_height_px
 
     def _on_timer(self) -> None:
         """Periodically publish zero Twist while a person is in frame.

@@ -8,6 +8,7 @@ Launches world, waits for Nav2, sends goal, collects metrics, then moves to next
 Usage:
   python3 test_runner.py              # Interactive — prompts for number of runs
   python3 test_runner.py --runs 10    # Run all scenarios 10 times each
+  python3 test_runner.py --headless   # Run without Gazebo/RViz GUI for faster batches
   python3 test_runner.py --runs 50    # Run all scenarios 50 times each (overnight)
 """
 
@@ -45,13 +46,16 @@ NAV2_MANAGED_ACTIVE_RE = re.compile(
 class TestRunner:
     """Manages automated performance testing across multiple scenarios."""
 
-    def __init__(self, config_file, num_runs=1):
+    def __init__(self, config_file, num_runs=1, headless=False):
         self.config_file = config_file
         self.scenarios = []
         self.current_processes = []
         self.log_files = []
         self.results_dir = '/ros2_ws/test_results'
         self.num_runs = num_runs
+        self.headless = headless
+        self._results_cache_mtime = None
+        self._results_cache_rows = {}
 
         # Load configuration
         self.load_config()
@@ -117,6 +121,9 @@ class TestRunner:
                 writer.writeheader()
             writer.writerow(row)
 
+        # Invalidate in-memory CSV cache so subsequent reads pick up this row.
+        self._results_cache_mtime = None
+
         print(f'[CSV] Wrote {reason} failure row for: {scenario["name"]} (run {run_number})')
 
     def _open_process_log(self, process_name, scenario_name=None, run_number=None):
@@ -142,18 +149,23 @@ class TestRunner:
         if not os.path.isfile(csv_path):
             return None
 
-        latest_match = None
         try:
-            with open(csv_path, 'r', newline='') as csvfile:
-                reader = csv.DictReader(csvfile)
-                for row in reader:
-                    if row.get('scenario_name') == scenario_name and str(row.get('run_number')) == str(run_number):
-                        latest_match = row
+            mtime = os.path.getmtime(csv_path)
+            if mtime != self._results_cache_mtime:
+                latest_rows = {}
+                with open(csv_path, 'r', newline='') as csvfile:
+                    reader = csv.DictReader(csvfile)
+                    for row in reader:
+                        key = (row.get('scenario_name'), str(row.get('run_number')))
+                        latest_rows[key] = row
+                self._results_cache_rows = latest_rows
+                self._results_cache_mtime = mtime
         except Exception as e:
             print(f'[CSV][WARN] Could not read combined results: {e}')
             return None
 
-        return latest_match
+        key = (scenario_name, str(run_number))
+        return self._results_cache_rows.get(key)
 
     @staticmethod
     def _csv_success_to_bool(value):
@@ -224,6 +236,7 @@ class TestRunner:
         last_reported_query_output = {}
         last_query_output_log_time = {}
         last_nonzero_rc_state_log = {}
+        launch_log_read_pos = 0
 
         def extract_state(output_text):
             matches = LIFECYCLE_STATE_RE.findall(output_text or '')
@@ -242,15 +255,25 @@ class TestRunner:
             return '\n'.join(lines).strip()
 
         def nav2_marked_active_in_launch_log():
+            nonlocal launch_log_read_pos
             if not launch_log_path:
                 return False
             if not os.path.isfile(launch_log_path):
                 return False
 
             try:
+                file_size = os.path.getsize(launch_log_path)
+                if file_size < launch_log_read_pos:
+                    launch_log_read_pos = 0
+
                 with open(launch_log_path, 'r', encoding='utf-8', errors='ignore') as f:
-                    content = f.read()
-                return NAV2_MANAGED_ACTIVE_RE.search(content) is not None
+                    f.seek(launch_log_read_pos)
+                    new_content = f.read()
+                    launch_log_read_pos = f.tell()
+
+                if not new_content:
+                    return False
+                return NAV2_MANAGED_ACTIVE_RE.search(new_content) is not None
             except Exception:
                 return False
 
@@ -433,6 +456,18 @@ class TestRunner:
             print(f'[HEALTH][WARN] Exception publishing /initialpose: {e}')
             return False
 
+    def stop_gui_processes(self):
+        """Best-effort stop of GUI-only processes for headless test runs."""
+        for target in ('gzclient', 'rviz2'):
+            try:
+                subprocess.run(
+                    ['pkill', '-15', target],
+                    stderr=subprocess.DEVNULL,
+                    stdout=subprocess.DEVNULL,
+                )
+            except Exception:
+                pass
+
     def launch_scenario(self, scenario, run_number):
         """Launch a single test scenario. Returns 'success', 'timeout', or 'error'."""
         print(f'\n{"="*70}')
@@ -453,6 +488,14 @@ class TestRunner:
 
         print(f'\n[LAUNCH] Starting {scenario["launch"]}...')
         launch_cmd = ['ros2', 'launch', 'amr_gazebo', scenario['launch']]
+        launch_env = os.environ.copy()
+
+        if self.headless:
+            # Force GUI apps to skip visible windows in batch mode.
+            launch_env['DISPLAY'] = ''
+            launch_env.setdefault('QT_QPA_PLATFORM', 'offscreen')
+            launch_env.setdefault('LIBGL_ALWAYS_SOFTWARE', '1')
+            print('[LAUNCH] Headless mode enabled: suppressing Gazebo/RViz GUI')
 
         try:
             launch_log_file, launch_log_path = self._open_process_log(
@@ -462,10 +505,15 @@ class TestRunner:
                 launch_cmd,
                 stdout=launch_log_file,
                 stderr=subprocess.STDOUT,
-                preexec_fn=os.setsid
+                preexec_fn=os.setsid,
+                env=launch_env,
             )
             self.current_processes.append(launch_process)
             print(f'[LAUNCH] amr_gazebo launch started (PID {launch_process.pid}) | log: {launch_log_path}')
+
+            if self.headless:
+                # Launch files start rviz2/gzclient unconditionally; stop them for headless throughput.
+                self.stop_gui_processes()
 
             # ── Phase 1: Short startup grace period (configurable) ─────
             startup_grace = float(scenario.get('startup_grace_s', 40.0))
@@ -473,6 +521,8 @@ class TestRunner:
             if startup_grace > 0:
                 print(f'[WAIT] Waiting {startup_grace:.1f}s startup grace...')
                 time.sleep(startup_grace)
+                if self.headless:
+                    self.stop_gui_processes()
 
             # ── Phase 2: Active health checks ──────────────────────────
             nav2_ready = self.wait_for_nav2_ready(
@@ -510,7 +560,11 @@ class TestRunner:
                 '-p', f'goal_x:={scenario["goal_pose"]["x"]}',
                 '-p', f'goal_y:={scenario["goal_pose"]["y"]}',
                 '-p', f'start_x:={scenario["start_pose"]["x"]}',
-                '-p', f'start_y:={scenario["start_pose"]["y"]}'
+                '-p', f'start_y:={scenario["start_pose"]["y"]}',
+                # test_runner already performs Nav2/AMCL readiness checks.
+                '-p', 'wait_for_action_server:=false',
+                '-p', 'wait_for_nav2_lifecycle:=false',
+                '-p', 'amcl_settle_seconds:=0.0',
             ]
 
             logger_log_file, logger_log_path = self._open_process_log(
@@ -673,33 +727,56 @@ class TestRunner:
         # ── Step 4: Clean up shared memory left by Gazebo ──────────
         print('[CLEANUP] Clearing shared memory...')
         try:
-            # Remove Gazebo/ROS shared memory semaphores
-            for shm_file in glob.glob('/dev/shm/sem.*'):
-                try:
-                    os.remove(shm_file)
-                except OSError:
-                    pass
-            # Remove other shared memory files
-            for shm_file in glob.glob('/dev/shm/*'):
-                try:
-                    os.remove(shm_file)
-                except OSError:
-                    pass
+            # Remove known ROS/Gazebo/FastDDS shared-memory artifacts only.
+            shm_patterns = [
+                '/dev/shm/sem.fastrtps_*',
+                '/dev/shm/sem.fastdds_*',
+                '/dev/shm/sem.gazebo*',
+                '/dev/shm/fastrtps_*',
+                '/dev/shm/fastdds_*',
+                '/dev/shm/gazebo*',
+                '/dev/shm/ignition*',
+                '/dev/shm/ros2_*',
+            ]
+            for pattern in shm_patterns:
+                for shm_file in glob.glob(pattern):
+                    try:
+                        os.remove(shm_file)
+                    except OSError:
+                        pass
         except Exception:
             pass
 
-        # Also clean up /tmp gazebo files that accumulate
+        # Also clean up stale /tmp gazebo/ros2 artifacts.
+        # Safety guards: only current-user files, skip symlinks, and keep recent files.
         try:
-            for tmp_file in glob.glob('/tmp/gazebo-*'):
-                subprocess.run(
-                    ['rm', '-rf', tmp_file],
-                    stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL
-                )
-            for tmp_file in glob.glob('/tmp/ros2_*'):
-                subprocess.run(
-                    ['rm', '-rf', tmp_file],
-                    stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL
-                )
+            cleanup_grace_seconds = 300
+            now = time.time()
+            current_uid = os.getuid() if hasattr(os, 'getuid') else None
+
+            for pattern in ('/tmp/gazebo-*', '/tmp/ros2_*'):
+                for tmp_file in glob.glob(pattern):
+                    try:
+                        st = os.lstat(tmp_file)
+
+                        # Never follow or remove symlinks via recursive delete path.
+                        if os.path.islink(tmp_file):
+                            continue
+
+                        # Avoid deleting artifacts from other users in shared environments.
+                        if current_uid is not None and hasattr(st, 'st_uid') and st.st_uid != current_uid:
+                            continue
+
+                        # Keep very recent files to avoid racing active processes.
+                        if (now - st.st_mtime) < cleanup_grace_seconds:
+                            continue
+
+                        if os.path.isdir(tmp_file):
+                            shutil.rmtree(tmp_file, ignore_errors=True)
+                        else:
+                            os.remove(tmp_file)
+                    except OSError:
+                        pass
         except Exception:
             pass
 
@@ -785,17 +862,22 @@ class TestRunner:
 
                 if result == 'success':
                     completed += 1
-                    # Verify logger actually wrote a CSV row
-                    csv_path = os.path.join(self.results_dir, 'combined_results.csv')
-                    if not os.path.isfile(csv_path):
+                    # Verify logger actually wrote a CSV row for this scenario/run.
+                    if self.get_scenario_result(scenario['name'], run) is None:
                         print('[WARN] Logger exited but no CSV found, writing placeholder')
                         self.write_timeout_result(scenario, run, reason='logger_no_output')
                 elif result == 'timeout':
                     timed_out += 1
-                    self.write_timeout_result(scenario, run, reason='timeout')
+                    if self.get_scenario_result(scenario['name'], run) is None:
+                        self.write_timeout_result(scenario, run, reason='timeout')
+                    else:
+                        print('[CSV] Existing row already present for timeout run; skipping placeholder write')
                 else:
                     failed += 1
-                    self.write_timeout_result(scenario, run, reason='error')
+                    if self.get_scenario_result(scenario['name'], run) is None:
+                        self.write_timeout_result(scenario, run, reason='error')
+                    else:
+                        print('[CSV] Existing row already present for failed run; skipping placeholder write')
 
                 # Print running totals
                 print(f'[STATS] So far: {completed} passed, {timed_out} timed out, '
@@ -836,6 +918,10 @@ Examples:
         '--runs', type=int, default=0,
         help='Number of times to run all scenarios (0 = interactive prompt)'
     )
+    parser.add_argument(
+        '--headless', '--no-gui', action='store_true',
+        help='Disable Gazebo and RViz GUI windows for faster batch testing'
+    )
     args = parser.parse_args()
 
     print('='*70)
@@ -867,6 +953,8 @@ Examples:
                 sys.exit(0)
 
     print(f'\n[INFO] Will run all scenarios {num_runs} time(s)')
+    if args.headless:
+        print('[INFO] Headless mode enabled (no GUI)')
 
     # ── Check shared memory ────────────────────────────────────────
     try:
@@ -882,7 +970,7 @@ Examples:
         pass
 
     # Create test runner
-    runner = TestRunner(config_file, num_runs=num_runs)
+    runner = TestRunner(config_file, num_runs=num_runs, headless=args.headless)
 
     # Setup signal handler for clean exit
     def signal_handler(sig, frame):
